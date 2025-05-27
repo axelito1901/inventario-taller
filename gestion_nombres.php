@@ -7,7 +7,6 @@ if (!isset($_SESSION['gerente'])) {
 
 include 'includes/conexion.php';
 
-<<<<<<< HEAD
 $mensaje_error_lanus = "";
 $mensaje_error_agregar = "";
 $mensaje_error_editar = "";
@@ -28,30 +27,17 @@ if (isset($_POST['eliminar_lanus'])) {
 }
 
 // Eliminar Osvaldo Cruz
-=======
-// Procesar eliminaciones
-if (isset($_POST['eliminar_lanus'])) {
-    $id = intval($_POST['eliminar_lanus']);
-    $conexion->query("DELETE FROM mecanicos WHERE id = $id");
-}
-
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 if (isset($_POST['eliminar_osvaldo'])) {
     $id = intval($_POST['eliminar_osvaldo']);
     $conexion->query("DELETE FROM nombres_personalizados WHERE id = $id");
 }
 
-<<<<<<< HEAD
 // Editar nombres
-=======
-// Procesar ediciones
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 if (isset($_POST['editar_id']) && isset($_POST['nuevo_nombre']) && isset($_POST['sucursal'])) {
     $id = intval($_POST['editar_id']);
     $nombre = trim($_POST['nuevo_nombre']);
     $tabla = $_POST['sucursal'] === 'Lanús' ? 'mecanicos' : 'nombres_personalizados';
 
-<<<<<<< HEAD
     $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM $tabla WHERE nombre = ? AND id != ?");
     $stmt->bind_param("si", $nombre, $id);
     $stmt->execute();
@@ -67,19 +53,10 @@ if (isset($_POST['editar_id']) && isset($_POST['nuevo_nombre']) && isset($_POST[
 }
 
 // Agregar nombres
-=======
-    $stmt = $conexion->prepare("UPDATE $tabla SET nombre = ? WHERE id = ?");
-    $stmt->bind_param("si", $nombre, $id);
-    $stmt->execute();
-}
-
-// Procesar agregados
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 if (isset($_POST['agregar_nombre']) && isset($_POST['agregar_sucursal'])) {
     $nombre = trim($_POST['agregar_nombre']);
     $tabla = $_POST['agregar_sucursal'] === 'Lanús' ? 'mecanicos' : 'nombres_personalizados';
 
-<<<<<<< HEAD
     $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM $tabla WHERE nombre = ?");
     $stmt->bind_param("s", $nombre);
     $stmt->execute();
@@ -95,14 +72,6 @@ if (isset($_POST['agregar_nombre']) && isset($_POST['agregar_sucursal'])) {
 }
 
 // Obtener listas
-=======
-    $stmt = $conexion->prepare("INSERT INTO $tabla (nombre) VALUES (?)");
-    $stmt->bind_param("s", $nombre);
-    $stmt->execute();
-}
-
-// Obtener nombres
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 $mecanicos = $conexion->query("SELECT id, nombre FROM mecanicos ORDER BY nombre ASC");
 $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER BY nombre ASC");
 ?>
@@ -113,15 +82,12 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
     <meta charset="UTF-8">
     <title>Gestión de nombres</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-<<<<<<< HEAD
     <style>
         mark {
             background-color: yellow;
             color: black;
         }
     </style>
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 </head>
 <body>
 <section class="section">
@@ -134,14 +100,11 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
 
     <form method="POST" class="box mb-5">
         <h2 class="subtitle is-4">➕ Agregar nuevo nombre</h2>
-<<<<<<< HEAD
 
         <?php if ($mensaje_error_agregar): ?>
             <div class="notification is-danger is-light"><?= $mensaje_error_agregar ?></div>
         <?php endif; ?>
 
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
         <div class="field">
             <label class="label">Nombre</label>
             <div class="control">
@@ -162,26 +125,20 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
         </div>
     </form>
 
-<<<<<<< HEAD
     <?php if ($mensaje_error_editar): ?>
         <div class="notification is-danger is-light mb-5"><?= $mensaje_error_editar ?></div>
     <?php endif; ?>
 
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
     <div class="columns">
         <!-- LANÚS -->
         <div class="column">
             <h2 class="subtitle is-4">🔴 Lanús (Mecánicos)</h2>
-<<<<<<< HEAD
 
             <?php if ($mensaje_error_lanus): ?>
                 <div class="notification is-danger is-light"><?= $mensaje_error_lanus ?></div>
             <?php endif; ?>
 
             <div id="lista-lanus">
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
             <?php foreach ($mecanicos as $m): ?>
                 <form method="POST" class="is-flex mb-2">
                     <input type="hidden" name="editar_id" value="<?= $m['id'] ?>">
@@ -191,20 +148,14 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
                     <button class="button is-danger" name="eliminar_lanus" value="<?= $m['id'] ?>" onclick="return confirm('¿Eliminar este nombre?')">🗑</button>
                 </form>
             <?php endforeach; ?>
-<<<<<<< HEAD
             </div>
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
         </div>
 
         <!-- OSVALDO CRUZ -->
         <div class="column">
             <h2 class="subtitle is-4">🔵 Osvaldo Cruz</h2>
-<<<<<<< HEAD
 
             <div id="lista-osvaldo">
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
             <?php foreach ($osvaldo as $o): ?>
                 <form method="POST" class="is-flex mb-2">
                     <input type="hidden" name="editar_id" value="<?= $o['id'] ?>">
@@ -214,15 +165,11 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
                     <button class="button is-danger" name="eliminar_osvaldo" value="<?= $o['id'] ?>" onclick="return confirm('¿Eliminar este nombre?')">🗑</button>
                 </form>
             <?php endforeach; ?>
-<<<<<<< HEAD
             </div>
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
         </div>
     </div>
 </div>
 </section>
-<<<<<<< HEAD
 
 <script>
 function normalizar(texto) {
@@ -250,7 +197,5 @@ function filtrar(input, tipo) {
 }
 </script>
 
-=======
->>>>>>> 7dc4a86132312e83d61594ec76609cb3a63ae188
 </body>
 </html>

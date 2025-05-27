@@ -1,7 +1,7 @@
 # Ignorar backups y bases de datos SQL
-*.sql
-backups/
-!backups/inventario.sql
+# *.sql
+# backups/
+# !backups/inventario.sql
 
 # Ignorar imágenes subidas manualmente
 imagenes/
