@@ -1,0 +1,28 @@
+# Ignorar backups y bases de datos SQL
+*.sql
+backups/
+!backups/inventario.sql
+
+# Ignorar imágenes subidas manualmente
+imagenes/
+
+# Ignorar archivos temporales
+*.log
+*.tmp
+*.bak
+
+# Ignorar configuraciones locales de XAMPP y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+
+# Ignorar archivos del sistema de Windows/macOS
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Ignorar carpetas de sesiones temporales
+sessions/
+cache/
