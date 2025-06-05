@@ -7,22 +7,23 @@ if (!isset($_SESSION['gerente'])) {
 
 include 'includes/conexion.php';
 
+// Filtro de búsqueda (si lo tenés)
 $buscar = isset($_GET['buscar']) ? $conexion->real_escape_string($_GET['buscar']) : '';
-$filtro = isset($_GET['filtro']) ? $_GET['filtro'] : 'todas';
-
 $where = "1";
-
 if ($buscar) {
     $where .= " AND (nombre LIKE '%$buscar%' OR codigo LIKE '%$buscar%')";
 }
 
-if ($filtro === 'stock') {
-    $where .= " AND cantidad > 0";
-} elseif ($filtro === 'sin_stock') {
-    $where .= " AND cantidad = 0";
-}
+// Ordenar por código numérico, los no numéricos al final
+$sql = "SELECT * FROM herramientas 
+        WHERE $where 
+        ORDER BY 
+            CASE 
+                WHEN codigo REGEXP '^[0-9]+$' THEN 0 
+                ELSE 1 
+            END, 
+            CAST(codigo AS UNSIGNED)";
 
-$sql = "SELECT * FROM herramientas WHERE $where";
 $herramientas = $conexion->query($sql);
 ?>
 
@@ -30,74 +31,59 @@ $herramientas = $conexion->query($sql);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Listar herramientas</title>
+    <title>Listado de Herramientas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 <section class="section">
     <div class="container">
-        <h1 class="title is-3">🔧 Listado de Herramientas</h1>
+        <h1 class="title is-3">📋 Herramientas registradas</h1>
+        <a href="dashboard.php" class="button is-light mb-4">⬅ Volver al panel</a>
 
-        <div class="table-container">
-            <table class="table is-fullwidth is-striped">
-                <thead>
+        <table class="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Ubicación</th>
+                    <th>Cantidad</th>
+                    <th>Imagen</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-herramientas">
+                <?php while ($h = $herramientas->fetch_assoc()): ?>
                     <tr>
-                        <th>ID</th>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Ubicación</th>
-                        <th>Cantidad</th>
-                        <th>Acción</th>
+                        <td><?= htmlspecialchars($h['codigo'] ?: '—') ?></td>
+                        <td><?= htmlspecialchars($h['nombre']) ?></td>
+                        <td><?= htmlspecialchars($h['ubicacion']) ?></td>
+                        <td><?= intval($h['cantidad']) ?></td>
+                        <td>
+                            <?php if ($h['imagen']): ?>
+                                <img src="<?= htmlspecialchars($h['imagen']) ?>" alt="Imagen" width="60">
+                            <?php else: ?>
+                                <span class="has-text-grey">sin imagen</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <a href="editar_herramienta.php?id=<?= $h['id'] ?>" class="button is-small is-info">✏️ Editar</a>
+                            <a href="eliminar_herramienta.php?id=<?= $h['id'] ?>" class="button is-small is-danger" onclick="return confirm('¿Seguro que querés eliminar esta herramienta?')">🗑️ Eliminar</a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php while ($h = $herramientas->fetch_assoc()): ?>
-                        <tr id="fila-<?= $h['id'] ?>">
-                            <td><?= $h['id'] ?></td>
-                            <td><?= htmlspecialchars($h['codigo']) ?></td>
-                            <td><?= htmlspecialchars($h['nombre']) ?></td>
-                            <td><?= htmlspecialchars($h['ubicacion']) ?></td>
-                            <td class="cantidad"><?= $h['cantidad'] ?></td>
-                            <td>
-                                <button class="button is-success is-small aumentar-stock" data-id="<?= $h['id'] ?>">
-                                    Aumentar stock
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
-
-        <a href="dashboard.php" class="button is-link">Volver al panel</a>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
 </section>
 
 <script>
-document.querySelectorAll('.aumentar-stock').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        const id = this.dataset.id;
-        const fila = document.querySelector('#fila-' + id);
-        const cantidadCelda = fila.querySelector('.cantidad');
-        const boton = this;
+// WebSocket para actualizar en tiempo real
+const socket = io("http://localhost:3000");
 
-        fetch('aumentar_stock.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'id=' + encodeURIComponent(id)
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data === 'ok') {
-                cantidadCelda.textContent = '1';
-                boton.disabled = true;
-                boton.classList.remove('is-success');
-                boton.classList.add('is-info');
-                boton.textContent = '✔ Listo';
-            }
-        });
-    });
+socket.on("herramientas", mensaje => {
+    console.log("🔁 Herramientas actualizadas:", mensaje);
+    location.reload(); // o podés usar fetch para actualizar solo #tabla-herramientas
 });
 </script>
 </body>

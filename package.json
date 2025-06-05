@@ -1,0 +1,23 @@
+{
+  "name": "inventario-taller",
+  "version": "1.0.0",
+  "main": "emisor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelito1901/inventario-taller.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axelito1901/inventario-taller/issues"
+  },
+  "homepage": "https://github.com/axelito1901/inventario-taller#readme",
+  "description": "",
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+}

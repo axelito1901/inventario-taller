@@ -22,7 +22,13 @@ if ($filtro === 'stock') {
     $where .= " AND cantidad = 0";
 }
 
-$sql = "SELECT * FROM herramientas WHERE $where";
+$sql = "SELECT * FROM herramientas WHERE $where
+            ORDER BY
+                CASE 
+                    WHEN codigo REGEXP '^[0-9]+$' THEN 0
+                    ELSE 1
+                END,
+                CAST(codigo AS UNSIGNED)";
 $herramientas = $conexion->query($sql);
 ?>
 
