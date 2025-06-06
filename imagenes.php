@@ -9,8 +9,8 @@ while ($herramienta = $resultado->fetch_assoc()) {
     $id = $herramienta['id'];
     $nombre_original = $herramienta['nombre'];
 
-    // Generar nombre de archivo
-    $nombre_limpio = trim(str_replace("/", "-", $nombre_original));
+    // Generar nombre de archivo: sin "/", ni espacios
+    $nombre_limpio = trim(str_replace(["/", " "], ["_", ""], $nombre_original));
     $extensiones = ['jpg', 'png', 'jpeg', 'webp']; // extensiones posibles
     $imagen_encontrada = null;
 
@@ -27,7 +27,7 @@ while ($herramienta = $resultado->fetch_assoc()) {
         $stmt = $conexion->prepare("UPDATE herramientas SET imagen = ? WHERE id = ?");
         $stmt->bind_param("si", $imagen_encontrada, $id);
         $stmt->execute();
-        echo "Asignada imagen a '$nombre_original': $imagen_encontrada<br>";
+        echo "✅ Asignada imagen a '$nombre_original': $imagen_encontrada<br>";
     } else {
         echo "⚠️ No se encontró imagen para '$nombre_original'<br>";
     }

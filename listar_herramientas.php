@@ -130,5 +130,111 @@ $herramientas = $conexion->query($sql);
         </table>
     </div>
 </section>
+
+<!-- Botón flotante moderno con animación al hacer clic -->
+<button id="btnSubir" title="Subir arriba" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: #3273dc;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 0 10px rgba(50, 115, 220, 0.5);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    ">
+    ↑
+</button>
+
+<style>
+#btnSubir:hover {
+    background: #2759a5;
+    transform: scale(1.1);
+}
+
+.btn-animado::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    animation: ripple 0.4s ease-out forwards;
+}
+
+@keyframes ripple {
+    from {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(8);
+        opacity: 0;
+    }
+}
+
+@keyframes pulseClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+</style>
+
+<script>
+const btnSubir = document.getElementById("btnSubir");
+
+// Mostrar u ocultar el botón según scroll
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 150) {
+        btnSubir.style.opacity = "1";
+        btnSubir.style.pointerEvents = "auto";
+    } else {
+        btnSubir.style.opacity = "0";
+        btnSubir.style.pointerEvents = "none";
+    }
+});
+
+// Efecto de onda al hacer clic
+btnSubir.addEventListener("click", (e) => {
+    // animación visual
+    btnSubir.classList.add("btn-animado");
+    btnSubir.style.animation = "pulseClick 0.3s";
+
+    // remover después de animar
+    setTimeout(() => {
+        btnSubir.classList.remove("btn-animado");
+        btnSubir.style.animation = "";
+    }, 300);
+
+    // efecto scroll
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Guardar scroll antes de salir
+window.addEventListener("beforeunload", () => {
+    localStorage.setItem("scrollY_herramientas", window.scrollY);
+});
+
+// Restaurar scroll al volver
+window.addEventListener("load", () => {
+    const y = localStorage.getItem("scrollY_herramientas");
+    if (y !== null) {
+        window.scrollTo(0, parseInt(y));
+        localStorage.removeItem("scrollY_herramientas");
+    }
+});
+</script>
+
 </body>
 </html>
