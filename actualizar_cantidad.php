@@ -116,7 +116,6 @@ $resultado = $conexion->query("SELECT * FROM herramientas ORDER BY CAST(codigo A
         </tbody>
     </table>
 
-    <!-- Modal -->
     <div class="modal" id="modalImagen">
         <div class="modal-background" onclick="cerrarModal()"></div>
         <div class="modal-content">

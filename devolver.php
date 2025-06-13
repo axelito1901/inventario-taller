@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['devolver_id'])) {
     exit;
 }
 
-// Cargar préstamos activos
+// se cargan los préstamos activos
 $prestamos = $conexion->query("
     SELECT p.id, h.nombre AS herramienta, p.fecha_hora, m.nombre AS mecanico, p.nombre_personalizado, p.sucursal
     FROM prestamos p

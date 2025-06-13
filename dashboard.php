@@ -34,50 +34,57 @@ $prestamos = $conexion->query("
 <head>
     <meta charset="UTF-8">
     <title>Panel del Gerente</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-    <div class="container">
+<body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
+    <header class="bg-white shadow p-4 flex items-center justify-between">
+        <h1 class="text-xl font-bold text-[var(--vw-blue)]">Bienvenido, <?= htmlspecialchars($nombreGerente) ?></h1>
+        <a href="logout.php" class="text-sm text-red-600 hover:underline">🚪 Cerrar sesión</a>
+    </header>
 
-        <h1 class="title is-3">Bienvenido, <?= htmlspecialchars($nombreGerente) ?></h1>
-
-        <div class="buttons mb-5">
-            <a href="listar_herramientas.php" class="button is-primary">🔧 Ver herramientas</a>
-            <a href="informe_diario.php" class="button is-info">📅 Informe diario</a>
-            <a href="exportar_informe_excel.php" class="button is-success">📁 Exportar Excel</a>
-            <a href="historial_informes.php" class="button is-dark">🗂 Historial de informes</a>
-            <a href="gestion_nombres.php" class="button is-warning">👤 Gestionar nombres</a>
-            <a href="logout.php" class="button is-danger">🚪 Cerrar sesión</a>
+    <main class="p-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+            <a href="listar_herramientas.php" class="bg-[var(--vw-blue)] text-white p-4 rounded-lg shadow hover:bg-blue-900 transition text-center">🔧 Ver herramientas</a>
+            <a href="informe_diario.php" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 transition text-center">📅 Informe diario</a>
+            <a href="exportar_informe_excel.php" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 transition text-center">📁 Exportar Excel</a>
+            <a href="historial_informes.php" class="bg-gray-800 text-white p-4 rounded-lg shadow hover:bg-gray-900 transition text-center">🗂 Historial informes</a>
+            <a href="gestion_nombres.php" class="bg-yellow-400 text-black p-4 rounded-lg shadow hover:bg-yellow-500 transition text-center">👤 Gestionar nombres</a>
         </div>
 
-        <h2 class="subtitle is-4">Préstamos activos</h2>
+        <h2 class="text-2xl font-semibold text-[var(--vw-blue)] mb-4">Préstamos activos</h2>
 
         <?php if ($prestamos->num_rows > 0): ?>
-            <table class="table is-fullwidth is-striped">
-                <thead>
-                    <tr>
-                        <th>Herramienta</th>
-                        <th>Prestado por</th>
-                        <th>Sucursal</th>
-                        <th>Fecha y hora</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $prestamos->fetch_assoc()): ?>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow text-sm">
+                    <thead class="bg-[var(--vw-blue)] text-white">
                         <tr>
-                            <td><?= htmlspecialchars($row['herramienta']) ?></td>
-                            <td><?= $row['mecanico'] ?? htmlspecialchars($row['nombre_personalizado']) ?></td>
-                            <td><?= htmlspecialchars($row['sucursal']) ?></td>
-                            <td><?= htmlspecialchars($row['fecha_hora']) ?></td>
+                            <th class="px-4 py-2 text-left">Herramienta</th>
+                            <th class="px-4 py-2 text-left">Prestado por</th>
+                            <th class="px-4 py-2 text-left">Sucursal</th>
+                            <th class="px-4 py-2 text-left">Fecha y hora</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $prestamos->fetch_assoc()): ?>
+                            <tr class="border-b hover:bg-[var(--vw-gray)]">
+                                <td class="px-4 py-2"><?= htmlspecialchars($row['herramienta']) ?></td>
+                                <td class="px-4 py-2"><?= $row['mecanico'] ?? htmlspecialchars($row['nombre_personalizado']) ?></td>
+                                <td class="px-4 py-2"><?= htmlspecialchars($row['sucursal']) ?></td>
+                                <td class="px-4 py-2"><?= htmlspecialchars($row['fecha_hora']) ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
-            <div class="notification is-info">No hay préstamos activos en este momento.</div>
+            <div class="p-4 bg-blue-100 text-blue-800 rounded-lg shadow-sm">No hay préstamos activos en este momento.</div>
         <?php endif; ?>
-    </div>
-</section>
+    </main>
 </body>
 </html>

@@ -28,39 +28,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Login Gerente</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-    <div class="container" style="max-width: 400px;">
-        <h2 class="title has-text-centered">Login Gerente</h2>
+<body class="flex items-center justify-center min-h-screen bg-[var(--vw-gray)]">
+    <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-bold text-center mb-6 text-[var(--vw-blue)]">Inicio de Sesión</h2>
 
         <?php if ($error): ?>
-            <div class="notification is-danger"><?= htmlspecialchars($error) ?></div>
+            <div class="mb-4 p-3 text-sm text-white bg-red-500 rounded-lg">
+                <?= htmlspecialchars($error) ?>
+            </div>
         <?php endif; ?>
 
-        <form method="post" autocomplete="off">
-            <div class="field">
-                <label class="label">Usuario</label>
-                <div class="control">
-                    <input class="input" type="text" name="nombre" placeholder="Usuario" required>
-                </div>
-            </div>
+        <form method="post" class="space-y-5">
+            <input type="text" name="nombre" placeholder="Usuario" required
+                class="w-full px-4 py-3 rounded-full bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--vw-blue)]">
 
-            <div class="field">
-                <label class="label">Contraseña</label>
-                <div class="control">
-                    <input class="input" type="password" name="contraseña" placeholder="Contraseña" required>
-                </div>
-            </div>
+            <input type="password" name="contraseña" placeholder="Contraseña" required
+                class="w-full px-4 py-3 rounded-full bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--vw-blue)]">
 
-            <div class="field">
-                <div class="control">
-                    <button class="button is-link is-fullwidth" type="submit">Ingresar</button>
-                </div>
-            </div>
+            <button type="submit"
+                class="w-full py-3 bg-[var(--vw-blue)] text-white font-semibold rounded-full hover:bg-blue-900 transition">
+                Iniciar Sesión
+            </button>
         </form>
     </div>
-</section>
 </body>
 </html>

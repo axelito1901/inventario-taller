@@ -40,16 +40,14 @@ if (is_dir($directorio)) {
         $coincideFecha = $fechaSeleccionada && str_contains($archivo, $fechaSeleccionada);
         $coincideMes = $mesSeleccionado && str_starts_with($archivo, 'informe_' . $mesSeleccionado);
 
-        if ($coincideTipo && (
-            ($fechaSeleccionada && $coincideFecha) ||
-            ($mesSeleccionado && $coincideMes) ||
-            (!$fechaSeleccionada && !$mesSeleccionado)
-        )) {
-            $filtrados[] = $archivo;
-        }
-
-        if ($tipoSeleccionado === 'todos' && !$fechaSeleccionada && !$mesSeleccionado) {
-            $filtrados[] = $archivo;
+        if ($coincideTipo) {
+            if (
+                ($fechaSeleccionada && $coincideFecha) ||
+                ($mesSeleccionado && $coincideMes) ||
+                (!$fechaSeleccionada && !$mesSeleccionado)
+            ) {
+                $filtrados[] = $archivo;
+            }
         }
     }
 }

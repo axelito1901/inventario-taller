@@ -13,8 +13,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 
 $herramienta_id = intval($_GET['id']);
-
-// Obtener nombre de la herramienta
 $herramienta = $conexion->query("SELECT nombre, codigo FROM herramientas WHERE id = $herramienta_id")->fetch_assoc();
 
 if (!$herramienta) {
@@ -22,7 +20,6 @@ if (!$herramienta) {
     exit();
 }
 
-// Buscar historial de préstamos
 $query = $conexion->query("
     SELECT p.fecha_hora, p.devuelta, p.fecha_devolucion, p.sucursal,
            m.nombre AS mecanico, p.nombre_personalizado
@@ -43,45 +40,55 @@ while ($row = $query->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <title>Historial - <?= htmlspecialchars($herramienta['nombre']) ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-    <div class="container">
-        <h1 class="title">📜 Historial de la herramienta</h1>
-        <h2 class="subtitle">
-            <strong><?= htmlspecialchars($herramienta['nombre']) ?></strong> (Código: <?= htmlspecialchars($herramienta['codigo']) ?>)
-        </h2>
+<body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
+<main class="max-w-6xl mx-auto p-6">
+    <h1 class="text-3xl font-bold text-[var(--vw-blue)] mb-2">📜 Historial de la herramienta</h1>
+    <h2 class="text-lg mb-6">
+        <strong><?= htmlspecialchars($herramienta['nombre']) ?></strong> (Código: <?= htmlspecialchars($herramienta['codigo']) ?>)
+    </h2>
 
-        <?php if (count($historial) === 0): ?>
-            <p>No hay préstamos registrados para esta herramienta.</p>
-        <?php else: ?>
-            <table class="table is-striped is-fullwidth">
-                <thead>
+    <?php if (count($historial) === 0): ?>
+        <p class="p-4 bg-yellow-100 text-yellow-800 rounded shadow">No hay préstamos registrados para esta herramienta.</p>
+    <?php else: ?>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white text-sm rounded shadow">
+                <thead class="bg-[var(--vw-blue)] text-white">
                     <tr>
-                        <th>Fecha y hora</th>
-                        <th>Prestado a</th>
-                        <th>Sucursal</th>
-                        <th>Devuelta</th>
-                        <th>Fecha de devolución</th>
+                        <th class="px-4 py-2 text-left">Fecha y hora</th>
+                        <th class="px-4 py-2 text-left">Prestado a</th>
+                        <th class="px-4 py-2 text-left">Sucursal</th>
+                        <th class="px-4 py-2 text-left">Devuelta</th>
+                        <th class="px-4 py-2 text-left">Fecha de devolución</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($historial as $h): ?>
-                        <tr>
-                            <td><?= date('d/m/Y H:i', strtotime($h['fecha_hora'])) ?></td>
-                            <td><?= htmlspecialchars($h['mecanico'] ?? $h['nombre_personalizado']) ?></td>
-                            <td><?= htmlspecialchars($h['sucursal']) ?></td>
-                            <td><?= $h['devuelta'] ? '✅' : '❌' ?></td>
-                            <td><?= $h['fecha_devolucion'] ? date('d/m/Y H:i', strtotime($h['fecha_devolucion'])) : '-' ?></td>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2"><?= date('d/m/Y H:i', strtotime($h['fecha_hora'])) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($h['mecanico'] ?? $h['nombre_personalizado']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($h['sucursal']) ?></td>
+                            <td class="px-4 py-2">
+                                <?= $h['devuelta'] ? '✅' : '❌' ?>
+                            </td>
+                            <td class="px-4 py-2">
+                                <?= $h['fecha_devolucion'] ? date('d/m/Y H:i', strtotime($h['fecha_devolucion'])) : '-' ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
-        <a href="dashboard.php" class="button is-link mt-4">⬅ Volver al panel</a>
-    </div>
-</section>
+    <a href="dashboard.php" class="mt-6 inline-block bg-[var(--vw-blue)] text-white px-5 py-2 rounded hover:bg-blue-900 transition">⬅ Volver al panel</a>
+</main>
 </body>
 </html>

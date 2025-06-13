@@ -10,12 +10,10 @@ include 'includes/conexion.php';
 $buscar = isset($_GET['buscar']) ? $conexion->real_escape_string($_GET['buscar']) : '';
 $filtro = isset($_GET['filtro']) ? $_GET['filtro'] : 'todas';
 
-$where = "1"; // Por defecto no filtra nada
-
+$where = "1";
 if ($buscar) {
     $where .= " AND (nombre LIKE '%$buscar%' OR codigo LIKE '%$buscar%')";
 }
-
 if ($filtro === 'stock') {
     $where .= " AND cantidad > 0";
 } elseif ($filtro === 'sin_stock') {
@@ -23,12 +21,12 @@ if ($filtro === 'stock') {
 }
 
 $sql = "SELECT * FROM herramientas WHERE $where
-            ORDER BY
-                CASE 
-                    WHEN codigo REGEXP '^[0-9]+$' THEN 0
-                    ELSE 1
-                END,
-                CAST(codigo AS UNSIGNED)";
+        ORDER BY
+            CASE 
+                WHEN codigo REGEXP '^[0-9]+$' THEN 0
+                ELSE 1
+            END,
+            CAST(codigo AS UNSIGNED)";
 $herramientas = $conexion->query($sql);
 ?>
 
@@ -37,204 +35,114 @@ $herramientas = $conexion->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Listado de herramientas</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        tbody {
-            zoom: 90%;
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
         }
     </style>
 </head>
-<body>
-<section class="section">
-    <div class="container">
-        <h2 class="title is-3">Herramientas registradas</h2>
+<body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
+    <main class="max-w-7xl mx-auto p-6">
+        <h2 class="text-3xl font-bold text-[var(--vw-blue)] mb-4">Herramientas registradas</h2>
 
-        <div class="buttons">
-            <a href="agregar_herramienta.php" class="button is-primary is-light">
-                ➕ Agregar nueva herramienta
-            </a>
-            <a href="informe_stock.php" class="button is-success is-light">
-                📋 Ver informe de stock
-            </a>
-            <a href="dashboard.php" class="button is-link is-light">
-                🏠 Volver al panel
-            </a>
+        <div class="flex flex-wrap gap-2 mb-4">
+            <a href="agregar_herramienta.php" class="bg-blue-100 text-[var(--vw-blue)] px-4 py-2 rounded shadow hover:bg-blue-200 transition">➕ Agregar nueva herramienta</a>
+            <a href="informe_stock.php" class="bg-green-100 text-green-700 px-4 py-2 rounded shadow hover:bg-green-200 transition">📋 Ver informe de stock</a>
+            <a href="dashboard.php" class="bg-gray-100 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-200 transition">🏠 Volver al panel</a>
         </div>
 
-        <form method="get" class="mb-4">
-            <div class="columns is-multiline">
-                <div class="column is-4">
-                    <input class="input" type="text" name="buscar" placeholder="Buscar por nombre o código..." value="<?= htmlspecialchars($buscar) ?>">
-                </div>
-                <div class="column is-4">
-                    <div class="select is-fullwidth">
-                        <select name="filtro" onchange="this.form.submit()">
-                            <option value="todas" <?= $filtro === 'todas' ? 'selected' : '' ?>>Mostrar todas</option>
-                            <option value="stock" <?= $filtro === 'stock' ? 'selected' : '' ?>>Solo en stock</option>
-                            <option value="sin_stock" <?= $filtro === 'sin_stock' ? 'selected' : '' ?>>Solo sin stock</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="column is-2">
-                    <button class="button is-info is-fullwidth" type="submit">Buscar</button>
-                </div>
-                <div class="column is-2">
-                    <a href="listar_herramientas.php" class="button is-light is-fullwidth">🔄 Limpiar filtros</a>
-                </div>
-            </div>
+        <form method="get" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="text" name="buscar" placeholder="Buscar por nombre o código..." value="<?= htmlspecialchars($buscar) ?>" class="px-4 py-2 rounded border w-full">
+            <select name="filtro" onchange="this.form.submit()" class="px-4 py-2 rounded border w-full">
+                <option value="todas" <?= $filtro === 'todas' ? 'selected' : '' ?>>Mostrar todas</option>
+                <option value="stock" <?= $filtro === 'stock' ? 'selected' : '' ?>>Solo en stock</option>
+                <option value="sin_stock" <?= $filtro === 'sin_stock' ? 'selected' : '' ?>>Solo sin stock</option>
+            </select>
+            <button type="submit" class="bg-[var(--vw-blue)] text-white rounded px-4 py-2 hover:bg-blue-900 transition w-full">Buscar</button>
+            <a href="listar_herramientas.php" class="bg-white border rounded px-4 py-2 text-center hover:bg-gray-100 transition w-full">🔄 Limpiar filtros</a>
         </form>
 
-        <table class="table is-striped is-fullwidth">
-            <thead>
-                <tr>
-                    <th class="has-text-centered">Imagen</th>
-                    <th class="has-text-centered">Código</th>
-                    <th class="has-text-centered">Nombre</th>
-                    <th class="has-text-centered">Ubicación</th>
-                    <th class="has-text-centered">Cantidad</th>
-                    <th class="has-text-centered">Stock</th>
-                    <th class="has-text-centered">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($herramienta = $herramientas->fetch_assoc()): ?>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm bg-white shadow rounded">
+                <thead class="bg-[var(--vw-blue)] text-white">
                     <tr>
-                        <td class="has-text-centered">
-                            <?php if (!empty($herramienta['imagen']) && file_exists($herramienta['imagen'])): ?>
-                                <img src="<?= $herramienta['imagen'] ?>" alt="<?= $herramienta['nombre'] ?>" width="100">
-                            <?php else: ?>
-                                <span class="has-text-grey-light">Sin imagen</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="has-text-centered"><?= htmlspecialchars($herramienta['codigo']) ?></td>
-                        <td class="has-text-centered"><?= htmlspecialchars($herramienta['nombre']) ?></td>
-                        <td class="has-text-centered"><?= htmlspecialchars($herramienta['ubicacion']) ?></td>
-                        <td class="has-text-centered"><?= intval($herramienta['cantidad']) ?></td>
-                        <td class="has-text-centered">
-                            <?php if ($herramienta['cantidad'] == 0): ?>
-                                <span class="tag is-danger is-light">🔴 Sin stock</span>
-                            <?php else: ?>
-                                <span class="tag is-success is-light">🟢 En stock</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="has-text-centered">
-                            <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                                <a href="editar_herramienta.php?id=<?= $herramienta['id'] ?>" class="button is-small is-warning">✏️ Editar</a>
-                                <a href="eliminar_herramienta.php?id=<?= $herramienta['id'] ?>" class="button is-small is-danger" onclick="return confirm('¿Estás seguro de eliminar esta herramienta?')">🗑️ Eliminar</a>
-                                <a href="historial_herramienta.php?id=<?= $herramienta['id'] ?>" class="button is-small is-info is-light">📜 Historial</a>
-                            </div>
-                        </td>
+                        <th class="px-4 py-2">Imagen</th>
+                        <th class="px-4 py-2">Código</th>
+                        <th class="px-4 py-2">Nombre</th>
+                        <th class="px-4 py-2">Ubicación</th>
+                        <th class="px-4 py-2">Cantidad</th>
+                        <th class="px-4 py-2">Stock</th>
+                        <th class="px-4 py-2">Acciones</th>
                     </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
-</section>
+                </thead>
+                <tbody class="text-center">
+                    <?php while ($herramienta = $herramientas->fetch_assoc()): ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">
+                                <?php if (!empty($herramienta['imagen']) && file_exists($herramienta['imagen'])): ?>
+                                    <img src="<?= $herramienta['imagen'] ?>" alt="<?= $herramienta['nombre'] ?>" class="h-16 mx-auto object-contain">
+                                <?php else: ?>
+                                    <span class="text-gray-400 italic">Sin imagen</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-2"><?= htmlspecialchars($herramienta['codigo']) ?></td>
+                            <td class="px-2"><?= htmlspecialchars($herramienta['nombre']) ?></td>
+                            <td class="px-2"><?= htmlspecialchars($herramienta['ubicacion']) ?></td>
+                            <td class="px-2"><?= intval($herramienta['cantidad']) ?></td>
+                            <td class="px-2">
+                                <?php if ($herramienta['cantidad'] == 0): ?>
+                                    <span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">🔴 Sin stock</span>
+                                <?php else: ?>
+                                    <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs">🟢 En stock</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-2 space-x-1">
+                                <a href="editar_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-yellow-400 text-black px-3 py-1 rounded text-xs hover:bg-yellow-500">✏️</a>
+                                <a href="eliminar_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600" onclick="return confirm('¿Estás seguro de eliminar esta herramienta?')">🗑️</a>
+                                <a href="historial_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-blue-100 text-[var(--vw-blue)] px-3 py-1 rounded text-xs hover:bg-blue-200">📜</a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
-<!-- Botón flotante moderno con animación al hacer clic -->
-<button id="btnSubir" title="Subir arriba" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999;
-    width: 48px;
-    height: 48px;
-    border: none;
-    border-radius: 50%;
-    background: #3273dc;
-    color: white;
-    font-size: 24px;
-    box-shadow: 0 0 10px rgba(50, 115, 220, 0.5);
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-    overflow: hidden;
-    ">
-    ↑
-</button>
+    <!-- Botón subir -->
+    <button id="btnSubir" title="Subir arriba" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[var(--vw-blue)] text-white text-xl shadow-lg transition transform hover:scale-110 opacity-0 pointer-events-none">↑</button>
 
-<style>
-#btnSubir:hover {
-    background: #2759a5;
-    transform: scale(1.1);
-}
+    <script>
+    const btnSubir = document.getElementById("btnSubir");
 
-.btn-animado::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    animation: ripple 0.4s ease-out forwards;
-}
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 150) {
+            btnSubir.style.opacity = "1";
+            btnSubir.style.pointerEvents = "auto";
+        } else {
+            btnSubir.style.opacity = "0";
+            btnSubir.style.pointerEvents = "none";
+        }
+    });
 
-@keyframes ripple {
-    from {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.8;
-    }
-    to {
-        transform: translate(-50%, -50%) scale(8);
-        opacity: 0;
-    }
-}
+    btnSubir.addEventListener("click", () => {
+        btnSubir.classList.add("animate-ping");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => btnSubir.classList.remove("animate-ping"), 300);
+    });
 
-@keyframes pulseClick {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-}
-</style>
+    window.addEventListener("beforeunload", () => {
+        localStorage.setItem("scrollY_herramientas", window.scrollY);
+    });
 
-<script>
-const btnSubir = document.getElementById("btnSubir");
-
-// Mostrar u ocultar el botón según scroll
-window.addEventListener("scroll", () => {
-    if (window.scrollY > 150) {
-        btnSubir.style.opacity = "1";
-        btnSubir.style.pointerEvents = "auto";
-    } else {
-        btnSubir.style.opacity = "0";
-        btnSubir.style.pointerEvents = "none";
-    }
-});
-
-// Efecto de onda al hacer clic
-btnSubir.addEventListener("click", (e) => {
-    // animación visual
-    btnSubir.classList.add("btn-animado");
-    btnSubir.style.animation = "pulseClick 0.3s";
-
-    // remover después de animar
-    setTimeout(() => {
-        btnSubir.classList.remove("btn-animado");
-        btnSubir.style.animation = "";
-    }, 300);
-
-    // efecto scroll
-    window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-// Guardar scroll antes de salir
-window.addEventListener("beforeunload", () => {
-    localStorage.setItem("scrollY_herramientas", window.scrollY);
-});
-
-// Restaurar scroll al volver
-window.addEventListener("load", () => {
-    const y = localStorage.getItem("scrollY_herramientas");
-    if (y !== null) {
-        window.scrollTo(0, parseInt(y));
-        localStorage.removeItem("scrollY_herramientas");
-    }
-});
-</script>
-
+    window.addEventListener("load", () => {
+        const y = localStorage.getItem("scrollY_herramientas");
+        if (y !== null) {
+            window.scrollTo(0, parseInt(y));
+            localStorage.removeItem("scrollY_herramientas");
+        }
+    });
+    </script>
 </body>
 </html>

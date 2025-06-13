@@ -14,7 +14,6 @@ if (!isset($_GET['id'])) {
 
 $id = $_GET['id'];
 
-// Obtener los datos actuales de la herramienta
 $stmt = $conexion->prepare("SELECT * FROM herramientas WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -31,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = $_POST['nombre'];
     $ubicacion = $_POST['ubicacion'];
     $cantidad = intval($_POST['cantidad']);
-    $imagen = $herramienta['imagen']; // Valor por defecto
+    $imagen = $herramienta['imagen'];
 
     if ($_FILES['imagen']['tmp_name']) {
         $imagen_nombre = time() . "_" . basename($_FILES['imagen']['name']);
@@ -59,95 +58,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Editar herramienta</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-    <div class="container">
-        <h2 class="title is-3">Editar herramienta</h2>
+<body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
+<main class="max-w-xl mx-auto p-6">
+    <h2 class="text-3xl font-bold text-[var(--vw-blue)] mb-4">Editar herramienta</h2>
 
-        <?php if (isset($mensaje)): ?>
-            <div class="notification is-success">
-                <?= htmlspecialchars($mensaje) ?>
-            </div>
-        <?php endif; ?>
+    <?php if (isset($mensaje)): ?>
+        <div class="p-4 bg-green-100 text-green-800 rounded mb-4 shadow"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
 
-        <form method="post" enctype="multipart/form-data">
-            <div class="field">
-                <label class="label">Código</label>
-                <div class="control">
-                    <input class="input" type="text" name="codigo" value="<?= htmlspecialchars($herramienta['codigo']) ?>" required>
-                </div>
-            </div>
+    <form method="post" enctype="multipart/form-data" class="space-y-5 bg-white p-6 rounded shadow">
+        <div>
+            <label class="block font-medium mb-1">Código</label>
+            <input type="text" name="codigo" value="<?= htmlspecialchars($herramienta['codigo']) ?>" required class="w-full px-4 py-2 border rounded">
+        </div>
 
-            <div class="field">
-                <label class="label">Nombre</label>
-                <div class="control">
-                    <input class="input" type="text" name="nombre" value="<?= htmlspecialchars($herramienta['nombre']) ?>" required>
-                </div>
-            </div>
+        <div>
+            <label class="block font-medium mb-1">Nombre</label>
+            <input type="text" name="nombre" value="<?= htmlspecialchars($herramienta['nombre']) ?>" required class="w-full px-4 py-2 border rounded">
+        </div>
 
-            <div class="field">
-                <label class="label">Ubicación</label>
-                <div class="control">
-                    <input class="input" type="text" name="ubicacion" value="<?= htmlspecialchars($herramienta['ubicacion']) ?>" required>
-                </div>
-            </div>
+        <div>
+            <label class="block font-medium mb-1">Ubicación</label>
+            <input type="text" name="ubicacion" value="<?= htmlspecialchars($herramienta['ubicacion']) ?>" required class="w-full px-4 py-2 border rounded">
+        </div>
 
-            <div class="field">
-                <label class="label">Cantidad</label>
-                <div class="control">
-                    <input class="input" type="number" name="cantidad" value="<?= intval($herramienta['cantidad']) ?>" min="0" required>
-                </div>
-            </div>
+        <div>
+            <label class="block font-medium mb-1">Cantidad</label>
+            <input type="number" name="cantidad" value="<?= intval($herramienta['cantidad']) ?>" min="0" required class="w-full px-4 py-2 border rounded">
+        </div>
 
-            <div class="field">
-                <?php if ($herramienta['cantidad'] == 0): ?>
-                    <button class="button is-danger is-light" disabled>🔴 Sin stock</button>
-                <?php else: ?>
-                    <button class="button is-success is-light" disabled>🟢 En stock</button>
-                <?php endif; ?>
-            </div>
+        <div>
+            <?php if ($herramienta['cantidad'] == 0): ?>
+                <span class="inline-block bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full">🔴 Sin stock</span>
+            <?php else: ?>
+                <span class="inline-block bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full">🟢 En stock</span>
+            <?php endif; ?>
+        </div>
 
-            <div class="field mt-4">
-                <label class="label">Imagen actual</label>
-                <?php if ($herramienta['imagen']): ?>
-                    <figure class="image is-128x128 mb-2">
-                        <img src="<?= htmlspecialchars($herramienta['imagen']) ?>" alt="Imagen actual">
-                    </figure>
-                <?php else: ?>
-                    <p>No hay imagen.</p>
-                <?php endif; ?>
-                <div class="file has-name is-boxed">
-                    <label class="file-label">
-                        <input class="file-input" type="file" name="imagen" accept="image/*">
-                        <span class="file-cta">
-                            <span class="file-icon">📁</span>
-                            <span class="file-label">Elegir archivo…</span>
-                        </span>
-                        <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
-                    </label>
-                </div>
-            </div>
+        <div>
+            <label class="block font-medium mb-1">Imagen actual</label>
+            <?php if ($herramienta['imagen']): ?>
+                <img src="<?= htmlspecialchars($herramienta['imagen']) ?>" alt="Imagen actual" class="h-32 object-contain mb-2 border rounded">
+            <?php else: ?>
+                <p class="text-sm text-gray-500 italic">No hay imagen.</p>
+            <?php endif; ?>
 
-            <div class="field mt-4">
-                <div class="control">
-                    <button class="button is-primary" type="submit">Guardar cambios</button>
-                </div>
-            </div>
-        </form>
+            <label class="block mt-2">
+                <input type="file" name="imagen" accept="image/*" class="block text-sm text-gray-700 mt-1">
+            </label>
+        </div>
 
-        <a href="listar_herramientas.php" class="button is-light mt-4">⬅ Volver a la lista</a>
-    </div>
-</section>
-
-<script>
-const fileInput = document.querySelector('.file-input');
-const fileName = document.getElementById('file-name');
-
-fileInput.addEventListener('change', () => {
-    fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'Ningún archivo seleccionado';
-});
-</script>
+        <div class="flex justify-between items-center">
+            <button type="submit" class="bg-[var(--vw-blue)] text-white px-4 py-2 rounded hover:bg-blue-900 transition">Guardar cambios</button>
+            <a href="listar_herramientas.php" class="text-sm text-[var(--vw-blue)] hover:underline">⬅ Volver a la lista</a>
+        </div>
+    </form>
+</main>
 </body>
 </html>

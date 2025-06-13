@@ -11,7 +11,7 @@ $mensaje_error_lanus = "";
 $mensaje_error_agregar = "";
 $mensaje_error_editar = "";
 
-// Eliminar Lanús
+// 
 if (isset($_POST['eliminar_lanus'])) {
     $id = intval($_POST['eliminar_lanus']);
     $stmt = $conexion->prepare("SELECT COUNT(*) as total FROM prestamos WHERE mecanico_id = ?");

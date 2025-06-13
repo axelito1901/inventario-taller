@@ -1,8 +1,0 @@
-<table border='1'><tr>
-    <th>Herramienta</th>
-    <th>Retirado por</th>
-    <th>Sucursal</th>
-    <th>Fecha y hora del préstamo</th>
-    <th>Estado</th>
-    <th>Fecha y hora de devolución</th>
-</tr><tr><td>VW681</td><td>Axel Perez</td><td>Lanús</td><td>2025-06-05 14:38:43</td><td>Devuelta</td><td>2025-06-05 14:40:09</td></tr><tr><td>40-105</td><td>Axel Perez</td><td>Lanús</td><td>2025-06-05 14:38:43</td><td>Activa</td><td>-</td></tr></table>

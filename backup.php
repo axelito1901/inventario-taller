@@ -1,5 +1,4 @@
 <?php
-// CONFIGURACIÓN
 $host = 'localhost';
 $usuario = 'root';
 $clave = ''; 
@@ -8,34 +7,31 @@ $bd = 'inventario';
 $fecha = date('Y-m-d_H-i-s');
 $archivo = "backups/respaldo_$fecha.sql";
 
-// Crear carpeta si no existe
+// se crea una carpeta de backups si no existe
 if (!is_dir('backups')) {
     mkdir('backups', 0777, true);
 }
 
-// Buscar mysqldump
+// se busca el comando mysqldump en el PATH del sistema
 $mysqldump = trim(shell_exec("where mysqldump")); // busca en el PATH
 
-// Si no está en PATH, probar con ruta por defecto de XAMPP
+// si no se encuentra, se intenta con la ruta por defecto de XAMPP
 if (!$mysqldump || !file_exists($mysqldump)) {
     $mysqldump = 'C:\xampp\mysql\bin\mysqldump.exe';
 }
 
-// Si sigue sin existir, mostrar error
+// si todavia no se encuentra, se muestra un error
 if (!file_exists($mysqldump)) {
     die("❌ Error: No se encontró <code>mysqldump</code>. Asegurate de tener XAMPP instalado o que esté en el PATH.");
 }
 
-// Asegurarse de que esté entre comillas por si hay espacios en el path
 $mysqldump = '"' . $mysqldump . '"';
 
-// Comando final
 $comando = "$mysqldump -h $host -u $usuario " . ($clave ? "-p$clave " : "") . "$bd > \"$archivo\"";
 
-// Ejecutar
 system($comando, $resultado);
 
-// Mostrar resultado
+// muestra ek resultado
 if ($resultado === 0) {
     echo "✅ Backup realizado correctamente: <a href='$archivo'>$archivo</a>";
 } else {

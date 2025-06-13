@@ -10,7 +10,7 @@ include 'includes/conexion.php';
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
-    // Borrar imagen si existe
+    // se borra la imagen elegida en la herramienta (si existe)
     $img = $conexion->query("SELECT imagen FROM herramientas WHERE id = $id")->fetch_assoc();
     if ($img && $img['imagen'] && file_exists($img['imagen'])) {
         unlink($img['imagen']);
