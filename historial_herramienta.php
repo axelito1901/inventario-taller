@@ -22,7 +22,7 @@ if (!$herramienta) {
 
 $query = $conexion->query("
     SELECT p.fecha_hora, p.devuelta, p.fecha_devolucion, p.sucursal,
-           m.nombre AS mecanico, p.nombre_personalizado
+       m.nombre AS mecanico, p.nombre_personalizado, p.comentario_devolucion
     FROM prestamos p
     LEFT JOIN mecanicos m ON p.mecanico_id = m.id
     WHERE p.herramienta_id = $herramienta_id
@@ -67,12 +67,13 @@ while ($row = $query->fetch_assoc()) {
                         <th class="px-4 py-2 text-left">Sucursal</th>
                         <th class="px-4 py-2 text-left">Devuelta</th>
                         <th class="px-4 py-2 text-left">Fecha de devolución</th>
+                        <th class="px-4 py-2 text-left">Comentario</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($historial as $h): ?>
                         <tr class="border-b hover:bg-gray-50">
-                            <td class="px-4 py-2"><?= date('d/m/Y H:i', strtotime($h['fecha_hora'])) ?></td>
+                            <td class="px-4 py-2"><?= $h['fecha_hora'] ? date('d/m/Y H:i', strtotime($h['fecha_hora'])) : '-' ?></td>
                             <td class="px-4 py-2"><?= htmlspecialchars($h['mecanico'] ?? $h['nombre_personalizado']) ?></td>
                             <td class="px-4 py-2"><?= htmlspecialchars($h['sucursal']) ?></td>
                             <td class="px-4 py-2">
@@ -81,6 +82,7 @@ while ($row = $query->fetch_assoc()) {
                             <td class="px-4 py-2">
                                 <?= $h['fecha_devolucion'] ? date('d/m/Y H:i', strtotime($h['fecha_devolucion'])) : '-' ?>
                             </td>
+                            <td class="px-4 py-2"><?= $h['comentario_devolucion'] ? htmlspecialchars($h['comentario_devolucion']) : '<span class="has-test-gray">-</span>' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

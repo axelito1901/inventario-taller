@@ -10,7 +10,7 @@ include 'includes/conexion.php';
 if (isset($_POST['herramienta_id'])) {
     $id = intval($_POST['herramienta_id']);
 
-    // Obtener stock actual
+    // de aca se puede obtener el stock actual
     $resultado = $conexion->query("SELECT stock FROM herramientas WHERE id = $id");
     if ($fila = $resultado->fetch_assoc()) {
         $nuevoStock = $fila['stock'] > 0 ? 0 : 1;

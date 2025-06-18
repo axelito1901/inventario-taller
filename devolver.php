@@ -4,17 +4,17 @@ include 'includes/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['devolver_id'])) {
     $id = intval($_POST['devolver_id']);
+    $comentario = trim($_POST['comentario'] ?? '');
     $fecha_devolucion = date('Y-m-d H:i:s');
 
-    $stmt = $conexion->prepare("UPDATE prestamos SET devuelta = 1, fecha_devolucion = ? WHERE id = ?");
-    $stmt->bind_param("si", $fecha_devolucion, $id);
+    $stmt = $conexion->prepare("UPDATE prestamos SET devuelta = 1, fecha_devolucion = ?, comentario_devolucion = ? WHERE id = ?");
+    $stmt->bind_param("ssi", $fecha_devolucion, $comentario, $id);
     $success = $stmt->execute();
 
     echo json_encode(['success' => $success]);
     exit;
 }
 
-// se cargan los préstamos activos
 $prestamos = $conexion->query("
     SELECT p.id, h.nombre AS herramienta, p.fecha_hora, m.nombre AS mecanico, p.nombre_personalizado, p.sucursal
     FROM prestamos p
@@ -24,62 +24,68 @@ $prestamos = $conexion->query("
     ORDER BY p.fecha_hora ASC
 ");
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Devolver herramienta</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-<section class="section">
-<div class="container">
-    <h1 class="title is-3">📦 Devolver herramienta</h1>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-blue-900 mb-6">📦 Devolver herramienta</h1>
 
-    <div id="mensaje" class="notification is-success is-hidden">✅ Herramienta devuelta correctamente.</div>
+    <div id="mensaje" class="hidden mb-4 p-3 bg-green-100 text-green-700 border border-green-300 rounded">✅ Herramienta devuelta correctamente.</div>
 
     <?php if ($prestamos->num_rows > 0): ?>
-        <table class="table is-striped is-fullwidth" id="tablaPrestamos">
-            <thead>
-                <tr>
-                    <th>Herramienta</th>
-                    <th>Prestada a</th>
-                    <th>Sucursal</th>
-                    <th>Fecha del préstamo</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($p = $prestamos->fetch_assoc()): ?>
-                    <tr id="fila-<?= $p['id'] ?>">
-                        <td><?= htmlspecialchars($p['herramienta']) ?></td>
-                        <td><?= htmlspecialchars($p['mecanico'] ?? $p['nombre_personalizado']) ?></td>
-                        <td><?= htmlspecialchars($p['sucursal']) ?></td>
-                        <td><?= date('d/m/Y H:i', strtotime($p['fecha_hora'])) ?></td>
-                        <td>
-                            <button class="button is-warning is-small devolver-btn" data-id="<?= $p['id'] ?>">📦 Devolver</button>
-                        </td>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 rounded shadow">
+                <thead class="bg-blue-50">
+                    <tr>
+                        <th class="py-2 px-3 text-left">Herramienta</th>
+                        <th class="py-2 px-3 text-left">Prestada a</th>
+                        <th class="py-2 px-3 text-left">Sucursal</th>
+                        <th class="py-2 px-3 text-left">Fecha del préstamo</th>
+                        <th class="py-2 px-3 text-left">Acción</th>
+                        <th class="py-2 px-3 text-left">Comentario</th>
                     </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="tablaPrestamos">
+                    <?php while ($p = $prestamos->fetch_assoc()): ?>
+                        <tr id="fila-<?= $p['id'] ?>" class="border-t">
+                            <td class="py-2 px-3"><?= htmlspecialchars($p['herramienta']) ?></td>
+                            <td class="py-2 px-3"><?= htmlspecialchars($p['mecanico'] ?? $p['nombre_personalizado']) ?></td>
+                            <td class="py-2 px-3"><?= htmlspecialchars($p['sucursal']) ?></td>
+                            <td class="py-2 px-3"><?= date('d/m/Y H:i', strtotime($p['fecha_hora'])) ?></td>
+                            <td class="py-2 px-3">
+                                <button class="devolver-btn bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm font-medium transition" data-id="<?= $p['id'] ?>">📦 Devolver</button>
+                            </td>
+                            <td>
+                                <textarea class="textarea is-small" rows="1" placeholder="Comentarios..." id="comentario-<?= $p['id'] ?>"></textarea>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     <?php else: ?>
-        <div class="notification is-info">No hay herramientas prestadas actualmente.</div>
+        <div class="p-4 bg-blue-100 text-blue-800 rounded border border-blue-300">
+            No hay herramientas prestadas actualmente.
+        </div>
     <?php endif; ?>
 
-    <div class="mt-4">
-        <a href="index.php" class="button is-light">⬅ Volver al inicio</a>
+    <div class="mt-6">
+        <a href="index.php" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">⬅ Volver al inicio</a>
     </div>
 </div>
-</section>
 
 <script>
 $('.devolver-btn').click(function() {
     const id = $(this).data('id');
+    const comentario = $(`#comentario-${id}`).val().trim();
 
-    $.post('devolver.php', { devolver_id: id }, function(response) {
+    $.post('devolver.php', { devolver_id: id, comentario: comentario }, function(response) {
         const data = JSON.parse(response);
         if (data.success) {
             $(`#fila-${id}`).fadeOut(300, function() { $(this).remove(); });

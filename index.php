@@ -20,150 +20,222 @@ while ($row = $prestadasQuery->fetch_assoc()) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>Préstamo de herramienta</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        #resultados, #resultados_nombres {
-            max-height: 150px;
-            overflow-y: auto;
-            cursor: pointer;
-        }
-        #resultados div:hover, #resultados_nombres div:hover {
-            background-color: #f5f5f5;
-        }
-        .herramienta-preview {
-            display: flex;
-            align-items: center;
-            background-color: #f0f0f0;
-            margin-bottom: 8px;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .herramienta-preview img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .herramienta-preview .remove {
-            margin-left: auto;
-            cursor: pointer;
-            color: red;
-            font-weight: bold;
-            font-size: 1.5rem;
-            line-height: 1;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .modal img {
-            max-width: 90%;
-            max-height: 90%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Préstamo de herramienta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    #boton-flotante {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 50;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
-<body class="is-flex is-flex-direction-column" style="min-height: 100vh;">
-<div class="modal" id="modalImagen">
-    <img id="imagenAmpliada" src="" alt="Vista ampliada">
-</div>
+<body class="bg-gray-100 text-gray-800">
+<div class="max-w-5xl mx-auto p-6">
+  <header class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-blue-900">Préstamo de herramientas</h1>
+    <a href="login.php" class="text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">🔐 Iniciar sesión</a>
+  </header>
 
-<section class="section">
-<div class="container">
-    <h1 class="title">Préstamo de herramientas</h1>
+  <div class="mb-4 flex gap-2">
+    <a href="dejar_comentario.php" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">💬 Dejar comentario</a>
+    <a href="devolver.php" class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded">📦 Devolver herramienta</a>
+  </div>
 
-    <div id="mensaje-error" class="notification is-danger is-hidden"></div>
-
-    <form action="registrar_prestamo.php" method="post" class="box" autocomplete="off" onsubmit="return validarFormulario()">
-        <div class="field">
-            <label class="label">Sucursal</label>
-            <div class="control">
-                <div class="select is-fullwidth">
-                    <select name="sucursal" id="sucursal" required>
-                        <option value="Lanús">Lanús</option>
-                        <option value="Osvaldo Cruz">Osvaldo Cruz</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="field">
-            <label class="label">Nombre de quien retira</label>
-            <div class="control">
-                <input class="input" type="text" id="nombre_personalizado" name="nombre_personalizado" placeholder="Ej: Axel Perez" autocomplete="off">
-                <div id="resultados_nombres" class="box" style="display:none;"></div>
-            </div>
-        </div>
-
-        <div class="field">
-            <label class="label">Buscar herramienta:</label>
-            <div class="control">
-                <input id="buscador_herramienta" class="input" type="text" placeholder="Escribí nombre o código de la herramienta">
-                <div id="resultados" class="box" style="display:none;"></div>
-            </div>
-        </div>
-
-        <div class="field">
-            <label class="label">Herramientas seleccionadas:</label>
-            <div id="seleccionadas"></div>
-        </div>
-
-        <div class="field mt-4">
-            <div class="control">
-                <button class="button is-info is-fullwidth" type="submit" id="btnEnviar" disabled>
-                    Registrar préstamo
-                </button>
-            </div>
-        </div>
-    </form>
-
-    <hr>
-
-    <h3 class="title is-4">Herramientas actualmente prestadas</h3>
-
-    <?php if (count($prestadas) > 0): ?>
-        <ul>
-            <?php foreach ($prestadas as $row): ?>
-                <?php
-                    $nombre = htmlspecialchars($row['mecanico'] ?? $row['nombre_personalizado']);
-                    $sucursal = htmlspecialchars($row['sucursal']);
-                    $color = $sucursal === 'Osvaldo Cruz' ? 'has-text-link' : 'has-text-danger';
-                    $icono = $sucursal === 'Osvaldo Cruz' ? '🔵' : '🔴';
-                ?>
-                <li class="mb-2">
-                    <strong><?= htmlspecialchars($row['herramienta']) ?></strong>
-                    (<?= htmlspecialchars($row['codigo']) ?> - <?= htmlspecialchars($row['ubicacion']) ?>)<br>
-                    <?= $icono ?> <span class="<?= $color ?>">Prestada a <strong><?= $nombre ?></strong> (<?= $sucursal ?>)</span>
-                    desde el <?= date('d/m/Y H:i', strtotime($row['fecha_hora'])) ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p>No hay herramientas prestadas actualmente.</p>
-    <?php endif; ?>
-
-    <p class="mt-4">
-        <a href="devolver.php" class="button is-warning">📦 Devolver herramienta</a>
-    </p>
-</div>
-</section>
-
-<footer class="footer-login has-text-right">
-    <div class="container is-flex is-justify-content-flex-end">
-        <a href="login.php" class="button is-info is-light">🔐 Iniciar sesión</a>
+  <form action="registrar_prestamo.php" method="post" class="space-y-4 bg-white p-6 rounded shadow" onsubmit="return validarFormulario()">
+    <div>
+      <label class="block font-medium">Sucursal</label>
+      <select name="sucursal" id="sucursal" class="w-full border rounded px-3 py-2">
+        <option value="Lanús">Lanús</option>
+        <option value="Osvaldo Cruz">Osvaldo Cruz</option>
+      </select>
     </div>
-</footer>
+
+    <div>
+      <label class="block font-medium">Nombre de quien retira</label>
+      <input type="text" name="nombre_personalizado" id="nombre_personalizado" placeholder="Ej: Axel Perez" class="w-full border rounded px-3 py-2" autocomplete="off">
+      <div id="resultados_nombres" class="bg-white border rounded mt-1 hidden max-h-32 overflow-y-auto text-sm z-10"></div>
+    </div>
+
+    <div>
+      <label class="block font-medium">Buscar herramienta</label>
+      <input type="text" id="buscador_herramienta" class="w-full border rounded px-3 py-2" placeholder="Escribí nombre o código">
+      <div id="resultados" class="mt-2 space-y-2"></div>
+    </div>
+
+    <div>
+      <label class="block font-medium">Herramientas seleccionadas</label>
+      <div id="seleccionadas"></div>
+    </div>
+
+    <div id="boton-flotante style:display: none;">
+      <button type="submit" id="btnEnviar" class="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition" disabled>
+        Registrar préstamo
+      </button>
+    </div>
+  </form>
+
+  <hr class="my-8">
+
+  <h2 class="text-xl font-bold mb-4">Herramientas actualmente prestadas</h2>
+  <?php if (count($prestadas) > 0): ?>
+    <ul class="space-y-2">
+      <?php foreach ($prestadas as $row): ?>
+        <?php
+          $nombre = htmlspecialchars($row['mecanico'] ?? $row['nombre_personalizado']);
+          $sucursal = htmlspecialchars($row['sucursal']);
+          $icono = $sucursal === 'Osvaldo Cruz' ? '🔵' : '🔴';
+          $color = $sucursal === 'Osvaldo Cruz' ? 'text-blue-600' : 'text-red-600';
+        ?>
+        <li class="p-3 bg-white border rounded shadow-sm">
+          <strong><?= htmlspecialchars($row['herramienta']) ?></strong>
+          (<?= htmlspecialchars($row['codigo']) ?> - <?= htmlspecialchars($row['ubicacion']) ?>)<br>
+          <?= $icono ?> <span class="<?= $color ?>">Prestada a <strong><?= $nombre ?></strong> (<?= $sucursal ?>)</span>
+          desde el <?= date('d/m/Y H:i', strtotime($row['fecha_hora'])) ?>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <p class="text-gray-600">No hay herramientas prestadas actualmente.</p>
+  <?php endif; ?>
+</div>
+
+<script>
+let herramientasSeleccionadas = [];
+
+$('#buscador_herramienta').on('input', function () {
+  const q = this.value.trim();
+  if (q.length < 1) return $('#resultados').hide();
+
+  fetch('buscar_herramientas.php?q=' + encodeURIComponent(q))
+    .then(res => res.json())
+    .then(data => {
+      const resDiv = $('#resultados');
+      resDiv.empty();
+      if (data.length === 0) {
+        resDiv.append('<p class="text-sm text-gray-500">No se encontraron herramientas.</p>');
+      } else {
+        data.forEach(h => {
+            const alreadySelected = herramientasSeleccionadas.some(s => s.id === h.id);
+            const disabled = h.cantidad == 0 || alreadySelected ? 'opacity-50 pointer-events-none' : '';
+            const prestada = h.cantidad == 0 ? 'bg-red-200' : (h.prestada ? 'bg-yellow-100 opacity-60 pointer-events-none' : 'bg-green-100');
+            const selectedClass = alreadySelected ? 'border-blue-500 bg-blue-50' : '';
+            const imagen = h.imagen
+                ? `<img src="${h.imagen}" class="w-16 h-16 object-contain">`
+                : '<div class="w-16 h-16 flex items-center justify-center bg-gray-200 text-xs">Sin imagen</div>';
+            const mensaje = alreadySelected ? '<p class="text-sm text-blue-600 mt-1">✔️ Ya seleccionada</p>' : '';
+
+            const card = `
+                <div class="flex items-center gap-4 p-3 border rounded ${disabled} ${prestada} ${selectedClass}" data-id="${h.id}">
+                    ${imagen}
+                    <div class="flex-1">
+                    <strong>${h.nombre}</strong><br>
+                    <small class="text-sm text-gray-600">Código: ${h.codigo}</small><br>
+                    <small class="text-gray-500">📍 ${h.ubicacion} | ${h.cantidad} en stock</small>
+                    ${mensaje}
+                    ${h.prestada ? '<br><span class="text-yellow-500">⚠️ Ya Prestada</span>' : ''}
+                    ${h.cantidad == 0 ? '<br><span class="text-red-500">❌ Sin stock</span>' : ''}
+                    </div>
+                </div>`;
+        resDiv.append(card);
+    });
+        resDiv.show();
+
+        $('#resultados div[data-id]').off('click').on('click', function () {
+          const id = parseInt($(this).data('id'));
+          const existente = herramientasSeleccionadas.find(h => h.id === id);
+          if (!existente) {
+            const h = data.find(x => x.id === id);
+            herramientasSeleccionadas.push(h);
+            actualizarVista();
+            $('#buscador_herramienta').val('');
+            $('#resultados').hide();
+          }
+        });
+      }
+    });
+});
+
+function actualizarVista() {
+  const cont = $('#seleccionadas');
+  cont.empty();
+  herramientasSeleccionadas.forEach(h => {
+    const imagen = h.imagen ? `<img src="${h.imagen}" class="w-16 h-16 object-contain">` : '<div class="w-16 h-16 flex items-center justify-center bg-gray-200 text-xs">Sin imagen</div>';
+    const item = `
+      <div class="flex items-center gap-4 bg-white border rounded p-3 mb-2 shadow">
+        ${imagen}
+        <div class="flex-1">
+          <strong>${h.nombre}</strong>
+          <br><small class="text-sm text-gray-600">Código: ${h.codigo}</small>
+          <br><small class="text-gray-500">📍 ${h.ubicacion}</small>
+        </div>
+        <input type="hidden" name="herramienta_id[]" value="${h.id}">
+        <button class="text-red-500 text-lg font-bold remove">✕</button>
+      </div>`;
+    cont.append(item);
+  });
+
+  const activo = herramientasSeleccionadas.length > 0;
+  $('#btnEnviar').prop('disabled', !activo);
+  $('#boton-flotante').toggle(activo); 
+
+  $('.remove').click(function () {
+    const idx = $(this).parent().index();
+    herramientasSeleccionadas.splice(idx, 1);
+    actualizarVista();
+  });
+}
+
+function validarFormulario() {
+  const nombre = $('#nombre_personalizado').val().trim();
+  if (!nombre) {
+    alert('⚠️ Ingresá el nombre.');
+    return false;
+  }
+  if (herramientasSeleccionadas.length === 0) {
+    alert('⚠️ Seleccioná al menos una herramienta.');
+    return false;
+  }
+  return true;
+}
+
+$('#nombre_personalizado').on('input', function () {
+  const query = $(this).val().trim();
+  const sucursal = $('#sucursal').val();
+  const contenedor = $('#resultados_nombres');
+  if (query.length < 2) {
+    contenedor.hide();
+    return;
+  }
+  $.getJSON('buscar_nombres.php?term=' + encodeURIComponent(query) + '&sucursal=' + encodeURIComponent(sucursal), function (data) {
+    if (data.length === 0) {
+      contenedor.html('<p class="p-2 text-gray-500">Sin coincidencias.</p>').show();
+      return;
+    }
+    contenedor.html('');
+    data.forEach(n => {
+      contenedor.append(`
+      <div class="flex items-center justify-between p-3 border-b hover:bg-blue-50 cursor-pointer rounded text-blue-900 font-medium transition" data-nombre="${n}">
+        <span>👤 ${n}</span>;
+        </div>
+    `);
+    });
+    contenedor.find('div').on('click', function () {
+      $('#nombre_personalizado').val($(this).data('nombre'));
+      contenedor.hide();
+    });
+    contenedor.show();
+  });
+});
+</script>
+</body>
+</html>
+
 
 <script>
 const inputHerramienta = document.getElementById('buscador_herramienta');
@@ -368,6 +440,6 @@ inputNombre.addEventListener('input', () => {
 
 // Cerrar modal al hacer clic fuera de la imagen
 modalImagen.addEventListener('click', () => {
-    modalImagen.style.display = 'none';
+    modalImagen.style.display = 'none';z
 });
 </script>

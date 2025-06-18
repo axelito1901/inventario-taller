@@ -58,6 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 Iniciar Sesión
             </button>
         </form>
+
+        <div class="mt-6 text-center">
+           <a href="index.php"
+            class="inline-block bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-700 hover:text-white transition duration-300 shadow-sm">
+            ⬅ Volver al inicio
+            </a>
+        </div>
     </div>
 </body>
 </html>
