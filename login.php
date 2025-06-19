@@ -8,21 +8,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = $_POST['nombre'];
     $contraseña = $_POST['contraseña'];
 
-    $stmt = $conexion->prepare("SELECT * FROM usuarios WHERE nombre = ? AND contraseña = ? AND tipo = 'gerente'");
-    $stmt->bind_param("ss", $nombre, $contraseña);
+    $stmt = $conexion->prepare("SELECT * FROM usuarios WHERE nombre = ? AND tipo = 'gerente'");
+    $stmt->bind_param("s", $nombre);
     $stmt->execute();
     $resultado = $stmt->get_result();
 
     if ($resultado->num_rows === 1) {
-        $_SESSION['gerente'] = $nombre;
-        header("Location: dashboard.php");
-        exit();
-    } else {
-        $error = "Usuario o contraseña incorrectos";
+        $usuario = $resultado->fetch_assoc();
+        if ($contraseña === $usuario['contraseña']) {
+            $_SESSION['gerente'] = $nombre;
+            header("Location: dashboard.php");
+            exit();
+        }
     }
+
+    $error = "Usuario o contraseña incorrectos";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -37,8 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-[var(--vw-gray)]">
-    <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center mb-6 text-[var(--vw-blue)]">Inicio de Sesión</h2>
+    <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg text-center">
+        <!-- LOGO CENTRADO -->
+        <div class="mb-6">
+            <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-20 w-auto mx-auto">
+        </div>
+
+        <h2 class="text-3xl font-bold mb-6 text-[var(--vw-blue)]">Inicio de Sesión</h2>
+
+        <?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'clave_actualizada'): ?>
+            <div class="mb-4 p-3 text-sm text-white bg-green-500 rounded-lg">
+                ✅ Contraseña actualizada. Iniciá sesión nuevamente.
+            </div>
+        <?php endif; ?>
 
         <?php if ($error): ?>
             <div class="mb-4 p-3 text-sm text-white bg-red-500 rounded-lg">
@@ -46,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         <?php endif; ?>
 
-        <form method="post" class="space-y-5">
+        <form method="post" class="space-y-5 text-left">
             <input type="text" name="nombre" placeholder="Usuario" required
                 class="w-full px-4 py-3 rounded-full bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--vw-blue)]">
 
@@ -60,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
 
         <div class="mt-6 text-center">
-           <a href="index.php"
+            <a href="index.php"
             class="inline-block bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-700 hover:text-white transition duration-300 shadow-sm">
             ⬅ Volver al inicio
             </a>

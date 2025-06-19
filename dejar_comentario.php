@@ -7,7 +7,7 @@ $mensaje = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = trim($_POST['nombre_personalizado'] ?? '');
     $sucursal = $_POST['sucursal'] ?? 'Lanús';
-    $comentarios = $_POST['comentario_devolucion'] ?? [];
+    $comentarios = $_POST['comentario'] ?? [];
 
     if ($nombre === '') {
         $mensaje = '❌ Debés ingresar un nombre.';
@@ -19,27 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (count($comentarios_validos) === 0) {
             $mensaje = '❌ El comentario debe tener al menos 5 caracteres.';
         } else {
-            if ($sucursal === 'Lanús') {
-                $conexion->query("INSERT IGNORE INTO mecanicos (nombre) VALUES ('$nombre')");
-                $res = $conexion->query("SELECT id FROM mecanicos WHERE nombre = '$nombre'");
-                $mecanico_id = $res->fetch_assoc()['id'] ?? null;
-            } else {
-                $conexion->query("INSERT IGNORE INTO nombres_personalizados (nombre) VALUES ('$nombre')");
-            }
-
+            $conexion->query("INSERT IGNORE INTO " . ($sucursal === 'Lanús' ? 'mecanicos' : 'nombres_personalizados') . " (nombre) VALUES ('$nombre')");
             $fecha = date('Y-m-d H:i:s');
 
             foreach ($comentarios_validos as $id => $comentario) {
                 $comentario = trim($comentario);
-                if ($sucursal === 'Lanús' && isset($mecanico_id)) {
-                    $stmt = $conexion->prepare("INSERT INTO prestamos (herramienta_id, mecanico_id, fecha_hora, devuelta, comentario_devolucion, sucursal, fecha_devolucion) VALUES (?, ?, ?, 1, ?, ?, ?)");
-                    $stmt->bind_param("iissss", $id, $mecanico_id, $fecha, $comentario, $sucursal, $fecha);
-                    $stmt->execute();
-                } else {
-                    $stmt = $conexion->prepare("INSERT INTO prestamos (herramienta_id, nombre_personalizado, fecha_hora, devuelta, comentario_devolucion, sucursal, fecha_devolucion) VALUES (?, ?, ?, 1, ?, ?, ?)");
-                    $stmt->bind_param("isssss", $id, $nombre, $fecha, $comentario, $sucursal, $fecha);
-                    $stmt->execute();
-                }
+                $stmt = $conexion->prepare("INSERT INTO comentarios (herramienta_id, nombre, sucursal, comentario, fecha) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("issss", $id, $nombre, $sucursal, $comentario, $fecha);
+                $stmt->execute();
             }
 
             $mensaje = '✅ Comentario registrado correctamente.';
@@ -51,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+    <div class="fixed top-4 left-4 z-50">
+      <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
+    </div>
   <title>Dejar comentario</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -68,9 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form method="post" class="space-y-6 bg-white p-6 rounded shadow" onsubmit="return validarEnvio()">
 
     <div>
-        <a href="index.php" class="inline-block bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded hover:bg-blue-700 hover:text-white transition duration-300 shadow-sm">
-              ⬅ Volver al panel
-        </a>
+      <a href="index.php" class="inline-block bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded hover:bg-blue-700 hover:text-white transition duration-300 shadow-sm">
+        ⬅ Volver al panel
+      </a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -156,10 +146,9 @@ function seleccionarHerramienta(h) {
         <p class="text-sm text-gray-600">Código: ${h.codigo}</p>
         <p class="text-sm text-gray-500">📍 ${h.ubicacion} | ${h.cantidad} unidades</p>
         ${stock}
-        <textarea name="comentario_devolucion[${h.id}]" class="w-full mt-3 px-3 py-2 border rounded text-sm" rows="3" minlength="5" required placeholder="Escribí al menos 5 caracteres..."></textarea>
+        <textarea name="comentario[${h.id}]" class="w-full mt-3 px-3 py-2 border rounded text-sm" rows="3" minlength="5" required placeholder="Escribí al menos 5 caracteres..."></textarea>
       </div>
     </div>`;
-
   resultados.html(html);
 }
 

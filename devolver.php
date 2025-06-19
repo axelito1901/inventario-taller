@@ -31,6 +31,9 @@ $prestamos = $conexion->query("
     <title>Devolver herramienta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <div class="fixed top-4 left-4 z-50">
+        <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
+    </div>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
 <div class="max-w-4xl mx-auto py-10 px-4">

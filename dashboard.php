@@ -19,11 +19,24 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
 $nombreGerente = $_SESSION['gerente'];
 
-$prestamos = $conexion->query("SELECT p.*, h.nombre AS herramienta, m.nombre AS mecanico FROM prestamos p LEFT JOIN herramientas h ON p.herramienta_id = h.id LEFT JOIN mecanicos m ON p.mecanico_id = m.id WHERE p.devuelta = 0 ORDER BY p.fecha_hora DESC");
+$prestamos = $conexion->query("
+    SELECT p.*, h.nombre AS herramienta, m.nombre AS mecanico
+    FROM prestamos p
+    LEFT JOIN herramientas h ON p.herramienta_id = h.id
+    LEFT JOIN mecanicos m ON p.mecanico_id = m.id
+    WHERE p.devuelta = 0
+    ORDER BY p.fecha_hora DESC
+");
 
-$comentarios = $conexion->query("SELECT p.id, p.comentario_devolucion, p.leido, h.id AS herramienta_id, h.nombre AS herramienta, h.codigo FROM prestamos p JOIN herramientas h ON p.herramienta_id = h.id WHERE p.comentario_devolucion IS NOT NULL AND TRIM(p.comentario_devolucion) != '' ORDER BY p.fecha_devolucion DESC LIMIT 10");
+$comentarios = $conexion->query("
+    SELECT c.*, h.nombre AS herramienta, h.codigo
+    FROM comentarios c
+    JOIN herramientas h ON c.herramienta_id = h.id
+    ORDER BY c.fecha DESC
+    LIMIT 10
+");
 
-$noLeidosRes = $conexion->query("SELECT COUNT(*) AS total FROM prestamos WHERE comentario_devolucion IS NOT NULL AND TRIM(comentario_devolucion) != '' AND leido = 0");
+$noLeidosRes = $conexion->query("SELECT COUNT(*) AS total FROM comentarios WHERE leido = 0");
 $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
 ?>
 <!DOCTYPE html>
@@ -41,7 +54,10 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
 </head>
 <body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
 <header class="bg-white shadow p-4 flex items-center justify-between relative">
-    <h1 class="text-xl font-bold text-[var(--vw-blue)]">Bienvenido, <?= htmlspecialchars($nombreGerente) ?></h1>
+    <div class="flex items-center gap-4">
+        <img src="logo-volskwagen.png" alt="Logo" class="h-12 w-auto ml-1">
+        <h1 class="text-xl font-bold text-[var(--vw-blue)]">Bienvenido, <?= htmlspecialchars($nombreGerente) ?></h1>
+    </div>
     <div class="flex items-center gap-4">
         <!-- Botón mensajes -->
         <div class="relative p-3 rounded border border-blue-300 hover:bg-blue-50 transition">
@@ -54,16 +70,14 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
             <div id="panelMensajes" class="hidden absolute right-0 mt-2 w-96 bg-white border border-gray-300 rounded shadow z-50 max-h-96 overflow-y-auto text-sm">
                 <?php if ($comentarios && $comentarios->num_rows > 0): ?>
                     <?php while ($c = $comentarios->fetch_assoc()): ?>
-                        <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>">
+                        <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>" id="comentario-<?= $c['id'] ?>">
                             <div class="text-gray-800 font-medium">🔧 <?= htmlspecialchars($c['herramienta']) ?> <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span></div>
-                            <div class="text-gray-600 italic text-xs mt-1">“<?= htmlspecialchars($c['comentario_devolucion']) ?>”</div>
+                            <div class="text-gray-600 italic text-xs mt-1">“<?= htmlspecialchars($c['comentario']) ?>”</div>
+                            <div class="mt-1 text-xs text-gray-500">📍 <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?></div>
                             <div class="mt-1 flex justify-between items-center">
                                 <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>" class="text-blue-700 text-xs hover:underline">🔎 Ver historial</a>
                                 <?php if (!$c['leido']): ?>
-                                    <form method="post" action="marcar_leido.php">
-                                        <input type="hidden" name="id" value="<?= $c['id'] ?>">
-                                        <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)" class="text-xs text-blue-600 hover:underline">✅ Marcar como leído</button>
-                                    </form>
+                                    <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)" class="text-xs text-blue-600 hover:underline">✅ Marcar como leído</button>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -84,6 +98,7 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
         <a href="informe_diario.php" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 transition text-center">📅 Informe diario</a>
         <a href="exportar_informe_excel.php" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 transition text-center">📁 Exportar Excel</a>
         <a href="historial_informes.php" class="bg-gray-800 text-white p-4 rounded-lg shadow hover:bg-gray-900 transition text-center">🗂 Historial informes</a>
+        <a href="actualizar_cantidad.php" class="inline-block bg-red-400 text-white p-4 rounded-lg shadow hover:bg-red-500 transition text-center">➕ Controlar Stock</a>
         <a href="gestion_nombres.php" class="bg-yellow-400 text-black p-4 rounded-lg shadow hover:bg-yellow-500 transition text-center">👤 Gestionar nombres</a>
     </div>
 
@@ -117,6 +132,12 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
     <?php endif; ?>
 </main>
 
+<div class="mt-12 text-center">
+  <a href="cambiar_credenciales.php" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition">
+    🔒 Cambiar contraseña
+  </a>
+</div>
+
 <script>
     const btnMensajes = document.getElementById('btnMensajes');
     const panelMensajes = document.getElementById('panelMensajes');
@@ -140,10 +161,32 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                btn.closest('.p-3').remove();
+                const contenedor = btn.closest('.p-3');
+                contenedor.classList.remove('bg-yellow-50');
+                btn.remove();
             }
-        })
+        });
     }
+
+    setInterval(() => {
+        fetch('contar_no_leidos.php')
+            .then(res => res.json())
+            .then(data => {
+                const btn = document.getElementById('btnMensajes');
+                let burbuja = btn.querySelector('span');
+
+                if (data.total > 0) {
+                    if (!burbuja) {
+                        burbuja = document.createElement('span');
+                        burbuja.className = 'absolute -top-2 -right-3 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow';
+                        btn.appendChild(burbuja);
+                    }   
+                    burbuja.textContent = data.total;
+                } else if (burbuja) {
+                    burbuja.remove();
+                }
+            });
+    }, 30000);
 </script>
 </body>
 </html>

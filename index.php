@@ -37,11 +37,15 @@ while ($row = $prestadasQuery->fetch_assoc()) {
 </head>
 <body class="bg-gray-100 text-gray-800">
 <div class="max-w-5xl mx-auto p-6">
+  <!-- LOGO -->
+  <div class="fixed top-4 left-4 z-50">
+    <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
+  </div>
+
   <header class="flex items-center justify-between mb-6">
     <h1 class="text-3xl font-bold text-blue-900">Préstamo de herramientas</h1>
     <a href="login.php" class="text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">🔐 Iniciar sesión</a>
   </header>
-
   <div class="mb-4 flex gap-2">
     <a href="dejar_comentario.php" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">💬 Dejar comentario</a>
     <a href="devolver.php" class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded">📦 Devolver herramienta</a>

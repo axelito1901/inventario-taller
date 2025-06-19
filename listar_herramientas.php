@@ -53,65 +53,50 @@ $herramientas = $conexion->query($sql);
             <a href="dashboard.php" class="bg-gray-100 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-200 transition">🏠 Volver al panel</a>
         </div>
 
-        <form method="get" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="text" name="buscar" placeholder="Buscar por nombre o código..." value="<?= htmlspecialchars($buscar) ?>" class="px-4 py-2 rounded border w-full">
-            <select name="filtro" onchange="this.form.submit()" class="px-4 py-2 rounded border w-full">
+        <form method="get" class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <input type="text" name="buscar" placeholder="Buscar por nombre o código..." value="<?= htmlspecialchars($buscar) ?>" class="px-4 py-2 rounded border w-full focus:ring-2 focus:ring-blue-300 transition">
+            <select name="filtro" onchange="this.form.submit()" class="px-4 py-2 rounded border w-full focus:ring-2 focus:ring-blue-300 transition">
                 <option value="todas" <?= $filtro === 'todas' ? 'selected' : '' ?>>Mostrar todas</option>
                 <option value="stock" <?= $filtro === 'stock' ? 'selected' : '' ?>>Solo en stock</option>
                 <option value="sin_stock" <?= $filtro === 'sin_stock' ? 'selected' : '' ?>>Solo sin stock</option>
             </select>
-            <button type="submit" class="bg-[var(--vw-blue)] text-white rounded px-4 py-2 hover:bg-blue-900 transition w-full">Buscar</button>
+            <button type="submit" class="bg-[var(--vw-blue)] text-white rounded px-4 py-2 hover:bg-blue-900 transition w-full">🔍 Buscar</button>
             <a href="listar_herramientas.php" class="bg-white border rounded px-4 py-2 text-center hover:bg-gray-100 transition w-full">🔄 Limpiar filtros</a>
         </form>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm bg-white shadow rounded">
-                <thead class="bg-[var(--vw-blue)] text-white">
-                    <tr>
-                        <th class="px-4 py-2">Imagen</th>
-                        <th class="px-4 py-2">Código</th>
-                        <th class="px-4 py-2">Nombre</th>
-                        <th class="px-4 py-2">Ubicación</th>
-                        <th class="px-4 py-2">Cantidad</th>
-                        <th class="px-4 py-2">Stock</th>
-                        <th class="px-4 py-2">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                    <?php while ($herramienta = $herramientas->fetch_assoc()): ?>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-2">
-                                <?php if (!empty($herramienta['imagen']) && file_exists($herramienta['imagen'])): ?>
-                                    <img src="<?= $herramienta['imagen'] ?>" alt="<?= $herramienta['nombre'] ?>" class="h-16 mx-auto object-contain">
-                                <?php else: ?>
-                                    <span class="text-gray-400 italic">Sin imagen</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="px-2"><?= htmlspecialchars($herramienta['codigo']) ?></td>
-                            <td class="px-2"><?= htmlspecialchars($herramienta['nombre']) ?></td>
-                            <td class="px-2"><?= htmlspecialchars($herramienta['ubicacion']) ?></td>
-                            <td class="px-2"><?= intval($herramienta['cantidad']) ?></td>
-                            <td class="px-2">
-                                <?php if ($herramienta['cantidad'] == 0): ?>
-                                    <span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">🔴 Sin stock</span>
-                                <?php else: ?>
-                                    <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs">🟢 En stock</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="px-2 space-x-1">
-                                <a href="editar_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-yellow-400 text-black px-3 py-1 rounded text-xs hover:bg-yellow-500">✏️</a>
-                                <a href="eliminar_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600" onclick="return confirm('¿Estás seguro de eliminar esta herramienta?')">🗑️</a>
-                                <a href="historial_herramienta.php?id=<?= $herramienta['id'] ?>" class="bg-blue-100 text-[var(--vw-blue)] px-3 py-1 rounded text-xs hover:bg-blue-200">📜</a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+        <!-- Vista única tipo tarjeta -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <?php while ($herramienta = $herramientas->fetch_assoc()): ?>
+                <div class="bg-white shadow rounded-lg p-4 flex flex-col">
+                    <?php if (!empty($herramienta['imagen']) && file_exists($herramienta['imagen'])): ?>
+                        <img src="<?= $herramienta['imagen'] ?>" alt="<?= $herramienta['nombre'] ?>" class="h-40 object-contain mx-auto mb-4">
+                    <?php else: ?>
+                        <div class="h-40 flex items-center justify-center bg-gray-100 text-gray-400 text-xs rounded mb-4">Sin imagen</div>
+                    <?php endif; ?>
+                    
+                    <h3 class="text-lg font-bold text-[var(--vw-blue)] mb-1"><?= htmlspecialchars($herramienta['nombre']) ?></h3>
+                    <p class="text-sm text-gray-500 mb-1">Código: <strong><?= htmlspecialchars($herramienta['codigo']) ?></strong></p>
+                    <p class="text-sm text-gray-500 mb-1">Ubicación: <?= htmlspecialchars($herramienta['ubicacion']) ?></p>
+                    <p class="text-sm text-gray-500 mb-2">Cantidad: <?= intval($herramienta['cantidad']) ?></p>
+
+                    <?php if ($herramienta['cantidad'] == 0): ?>
+                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs mb-2 w-max">🔴 Sin stock</span>
+                    <?php else: ?>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs mb-2 w-max">🟢 En stock</span>
+                    <?php endif; ?>
+
+                    <div class="mt-auto flex gap-2 pt-2">
+                        <a href="editar_herramienta.php?id=<?= $herramienta['id'] ?>" class="flex-1 text-center bg-yellow-400 text-black py-2 rounded text-sm hover:bg-yellow-500">✏️ Editar</a>
+                        <a href="eliminar_herramienta.php?id=<?= $herramienta['id'] ?>" class="flex-1 text-center bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600" onclick="return confirm('¿Estás seguro de eliminar esta herramienta?')">🗑️ Borrar</a>
+                        <a href="historial_herramienta.php?id=<?= $herramienta['id'] ?>" class="flex-1 text-center bg-blue-100 text-[var(--vw-blue)] py-2 rounded text-sm hover:bg-blue-200">📜 Historial</a>
+                    </div>
+                </div>
+            <?php endwhile; ?>
         </div>
     </main>
 
     <!-- Botón subir -->
-    <button id="btnSubir" title="Subir arriba" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[var(--vw-blue)] text-white text-xl shadow-lg transition transform hover:scale-110 opacity-0 pointer-events-none">↑</button>
+    <button id="btnSubir" title="Subir arriba" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[var(--vw-blue)] text-white text-xl shadow-lg transition transform hover:scale-110 opacity-0 pointer-events-none z-50">↑</button>
 
     <script>
     const btnSubir = document.getElementById("btnSubir");

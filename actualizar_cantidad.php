@@ -74,6 +74,11 @@ $resultado = $conexion->query("SELECT * FROM herramientas ORDER BY CAST(codigo A
 </head>
 <body class="section">
     <h1 class="title">Actualizar Cantidad (Stock)</h1>
+
+    <div class="flex flex-wrap gap-2 mb-4">
+        <a href="dashboard.php" class="">⬅ Volver al panel</a>
+    </div>
+
     <table class="table is-fullwidth is-striped is-hoverable">
         <thead>
             <tr>
