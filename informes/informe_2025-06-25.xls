@@ -1,0 +1,8 @@
+<table border='1'><tr>
+    <th>Herramienta</th>
+    <th>Retirado por</th>
+    <th>Sucursal</th>
+    <th>Fecha y hora del préstamo</th>
+    <th>Estado</th>
+    <th>Fecha y hora de devolución</th>
+</tr><tr><td>3014</td><td>Axel Perez</td><td>Lanús</td><td>2025-06-25 15:27:03</td><td>Activa</td><td>-</td></tr></table>

@@ -73,6 +73,8 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
                         <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>" id="comentario-<?= $c['id'] ?>">
                             <div class="text-gray-800 font-medium">🔧 <?= htmlspecialchars($c['herramienta']) ?> <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span></div>
                             <div class="text-gray-600 italic text-xs mt-1">“<?= htmlspecialchars($c['comentario']) ?>”</div>
+                            <!-- NOMBRE DEL USUARIO/MECÁNICO -->
+                            <div class="text-blue-800 text-xs mt-1">Por: <strong><?= htmlspecialchars($c['nombre']) ?></strong></div>
                             <div class="mt-1 text-xs text-gray-500">📍 <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?></div>
                             <div class="mt-1 flex justify-between items-center">
                                 <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>" class="text-blue-700 text-xs hover:underline">🔎 Ver historial</a>

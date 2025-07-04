@@ -31,14 +31,25 @@ $prestamos = $conexion->query("
     <title>Devolver herramienta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <div class="fixed top-4 left-4 z-50">
-        <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
-    </div>
+    <style>
+      body { background: #f6f6f6; }
+      header.header-fixed-vw {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-bottom: 1px solid #e5e7eb;
+      }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
-<div class="max-w-4xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold text-blue-900 mb-6">📦 Devolver herramienta</h1>
 
+<!-- HEADER FIJO CON LOGO Y TÍTULO -->
+<header class="header-fixed-vw fixed top-0 left-0 w-full bg-white z-50 flex items-center px-8 py-2" style="height:68px;">
+  <img src="logo-volskwagen.png" alt="Logo de VW" class="h-12 w-auto mr-4 select-none" draggable="false" style="pointer-events:none;">
+  <span class="text-2xl font-bold text-blue-900">Devolver herramienta</span>
+  <a href="index.php" class="ml-auto text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">⬅ Volver al inicio</a>
+</header>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div class="max-w-4xl mx-auto pt-28 py-10 px-4">
     <div id="mensaje" class="hidden mb-4 p-3 bg-green-100 text-green-700 border border-green-300 rounded">✅ Herramienta devuelta correctamente.</div>
 
     <?php if ($prestamos->num_rows > 0): ?>
@@ -77,10 +88,6 @@ $prestamos = $conexion->query("
             No hay herramientas prestadas actualmente.
         </div>
     <?php endif; ?>
-
-    <div class="mt-6">
-        <a href="index.php" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">⬅ Volver al inicio</a>
-    </div>
 </div>
 
 <script>
@@ -92,8 +99,8 @@ $('.devolver-btn').click(function() {
         const data = JSON.parse(response);
         if (data.success) {
             $(`#fila-${id}`).fadeOut(300, function() { $(this).remove(); });
-            $('#mensaje').removeClass('is-hidden');
-            setTimeout(() => $('#mensaje').addClass('is-hidden'), 2000);
+            $('#mensaje').removeClass('hidden');
+            setTimeout(() => $('#mensaje').addClass('hidden'), 2000);
         } else {
             alert('⚠️ Hubo un error al devolver la herramienta.');
         }

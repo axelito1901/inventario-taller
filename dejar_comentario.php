@@ -38,17 +38,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-    <div class="fixed top-4 left-4 z-50">
-      <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
-    </div>
   <title>Dejar comentario</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body { background: #f6f6f6; }
+    header.header-fixed-vw {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #e5e7eb;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
-<div class="max-w-4xl mx-auto py-10 px-4">
-  <h1 class="text-3xl font-bold text-blue-900 mb-6">📝 Dejar comentario sobre una herramienta</h1>
 
+<!-- HEADER FIJO CON LOGO Y TÍTULO -->
+<header class="header-fixed-vw fixed top-0 left-0 w-full bg-white z-50 flex items-center px-8 py-2" style="height:68px;">
+  <img src="logo-volskwagen.png" alt="Logo de VW" class="h-12 w-auto mr-4 select-none" draggable="false" style="pointer-events:none;">
+  <span class="text-2xl font-bold text-blue-900">Dejar comentario</span>
+  <a href="index.php" class="ml-auto text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">⬅ Volver al panel</a>
+</header>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div class="max-w-4xl mx-auto pt-28 py-10 px-4">
   <?php if ($mensaje): ?>
     <div class="mb-6 p-4 <?= str_starts_with($mensaje, '✅') ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-700 border-red-300' ?> border rounded shadow">
       <?= htmlspecialchars($mensaje) ?>
@@ -56,12 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <form method="post" class="space-y-6 bg-white p-6 rounded shadow" onsubmit="return validarEnvio()">
-
-    <div>
-      <a href="index.php" class="inline-block bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded hover:bg-blue-700 hover:text-white transition duration-300 shadow-sm">
-        ⬅ Volver al panel
-      </a>
-    </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>

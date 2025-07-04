@@ -26,26 +26,39 @@ while ($row = $prestadasQuery->fetch_assoc()) {
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     #boton-flotante {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 50;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 440px;
+      max-width: 90vw;
+    }
+    @media (max-width: 640px) {
+      #boton-flotante { width: 98vw; left: 1vw; transform: none; }
+    }
+    body {
+      background: #f6f6f6;
+    }
+    header.header-fixed-vw {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #e5e7eb;
     }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
-<div class="max-w-5xl mx-auto p-6">
-  <!-- LOGO -->
-  <div class="fixed top-4 left-4 z-50">
-    <img src="logo-volskwagen.png" alt="Logo de la empresa" class="h-16 w-auto">
-  </div>
 
-  <header class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold text-blue-900">Préstamo de herramientas</h1>
-    <a href="login.php" class="text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">🔐 Iniciar sesión</a>
-  </header>
+<!-- HEADER FIJO CON LOGO -->
+<header class="header-fixed-vw fixed top-0 left-0 w-full bg-white z-50 flex items-center px-8 py-2" style="height:68px;">
+  <img src="logo-volskwagen.png" alt="Logo de VW" class="h-12 w-auto mr-4 select-none" draggable="false" style="pointer-events:none;">
+  <span class="text-2xl font-bold text-blue-900">Préstamo de herramientas</span>
+  <a href="login.php" class="ml-auto text-sm bg-blue-100 text-blue-800 px-4 py-2 rounded hover:bg-blue-200 transition">🔐 Iniciar sesión</a>
+</header>
+
+<!-- CONTENIDO PRINCIPAL CON PADDING TOP PARA NO TAPAR EL HEADER -->
+<div class="max-w-5xl mx-auto p-6 pt-28">
+
   <div class="mb-4 flex gap-2">
     <a href="dejar_comentario.php" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">💬 Dejar comentario</a>
     <a href="devolver.php" class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded">📦 Devolver herramienta</a>
@@ -77,8 +90,9 @@ while ($row = $prestadasQuery->fetch_assoc()) {
       <div id="seleccionadas"></div>
     </div>
 
-    <div id="boton-flotante style:display: none;">
-      <button type="submit" id="btnEnviar" class="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition" disabled>
+    <div id="boton-flotante" style="display: none;">
+      <button type="submit" id="btnEnviar"
+       class="w-full py-3 px-6 text-lg font-semibold bg-blue-700 text-white rounded-xl shadow-lg hover:bg-blue-800 transition-all duration-200 border-2 border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400" disabled>
         Registrar préstamo
       </button>
     </div>
@@ -109,6 +123,7 @@ while ($row = $prestadasQuery->fetch_assoc()) {
   <?php endif; ?>
 </div>
 
+<!-- SCRIPTS -->
 <script>
 let herramientasSeleccionadas = [];
 
@@ -224,9 +239,7 @@ $('#nombre_personalizado').on('input', function () {
     contenedor.html('');
     data.forEach(n => {
       contenedor.append(`
-      <div class="flex items-center justify-between p-3 border-b hover:bg-blue-50 cursor-pointer rounded text-blue-900 font-medium transition" data-nombre="${n}">
-        <span>👤 ${n}</span>;
-        </div>
+      <div class="flex items-center justify-between p-3 border-b hover:bg-blue-50 cursor-pointer rounded text-blue-900 font-medium transition" data-nombre="${n}"><span>👤 ${n}</span></div>
     `);
     });
     contenedor.find('div').on('click', function () {
@@ -239,211 +252,3 @@ $('#nombre_personalizado').on('input', function () {
 </script>
 </body>
 </html>
-
-
-<script>
-const inputHerramienta = document.getElementById('buscador_herramienta');
-const resultados = document.getElementById('resultados');
-const seleccionadas = document.getElementById('seleccionadas');
-const btnEnviar = document.getElementById('btnEnviar');
-const mensajeError = document.getElementById('mensaje-error');
-const modalImagen = document.getElementById('modalImagen');
-const imagenAmpliada = document.getElementById('imagenAmpliada');
-let herramientasSeleccionadas = [];
-
-function actualizarVista() {
-    seleccionadas.innerHTML = '';
-    herramientasSeleccionadas.forEach(h => {
-        const contenedor = document.createElement('div');
-        contenedor.className = 'herramienta-preview';
-
-        if (h.imagen && h.imagen.trim() !== '') {
-            const img = document.createElement('img');
-            img.src = h.imagen;
-            img.alt = h.nombre;
-            img.onclick = () => {
-                imagenAmpliada.src = h.imagen;
-                modalImagen.style.display = 'flex';
-            };
-            contenedor.appendChild(img);
-        } else {
-            const texto = document.createElement('span');
-            texto.innerHTML = '<em>Sin Imagen</em>';
-            texto.className = 'has-text-grey is-italic';
-            texto.style.marginRight = '10px';
-            texto.style.fontSize = '0.9rem';
-            contenedor.appendChild(texto);
-        }
-
-        const contenedorInfo = document.createElement('div');
-        contenedorInfo.innerHTML = `
-            <strong>${h.nombre}</strong><br>
-            <span class="tag is-info is-light is-small">Código: ${h.codigo}</span><br>
-            <span class="is-size-7 has-text-grey">📍 ${h.ubicacion}</span>
-        `;
-
-        const cerrar = document.createElement('span');
-        cerrar.className = 'remove';
-        cerrar.textContent = '✕';
-        cerrar.onclick = () => {
-            herramientasSeleccionadas = herramientasSeleccionadas.filter(e => e.id !== h.id);
-            actualizarVista();
-        };
-
-        const inputHidden = document.createElement('input');
-        inputHidden.type = 'hidden';
-        inputHidden.name = 'herramienta_id[]';
-        inputHidden.value = h.id;
-
-        contenedor.appendChild(contenedorInfo);
-        contenedor.appendChild(cerrar);
-        contenedor.appendChild(inputHidden);
-        seleccionadas.appendChild(contenedor);
-    });
-
-    btnEnviar.disabled = herramientasSeleccionadas.length === 0;
-
-    // Marcar como ya seleccionadas
-    document.querySelectorAll('#resultados div[data-id]').forEach(div => {
-        const id = parseInt(div.getAttribute('data-id'));
-        if (herramientasSeleccionadas.some(h => h.id === id)) {
-            div.classList.add('has-background-grey-lighter');
-        } else {
-            div.classList.remove('has-background-grey-lighter');
-        }
-    });
-}
-
-function validarFormulario() {
-    const nombre = document.getElementById('nombre_personalizado').value.trim();
-    mensajeError.classList.add('is-hidden');
-    mensajeError.innerText = '';
-
-    if (nombre === '') {
-        mensajeError.innerText = '⚠️ Por favor ingresá el nombre de quien retira.';
-        mensajeError.classList.remove('is-hidden');
-        return false;
-    }
-    if (herramientasSeleccionadas.length === 0) {
-        mensajeError.innerText = '⚠️ Debés seleccionar al menos una herramienta.';
-        mensajeError.classList.remove('is-hidden');
-        return false;
-    }
-    return true;
-}
-
-inputHerramienta.addEventListener('input', () => {
-    const query = inputHerramienta.value.trim();
-    if (query.length < 1) {
-        resultados.style.display = 'none';
-        resultados.innerHTML = '';
-        return;
-    }
-
-    fetch('buscar_herramientas.php?q=' + encodeURIComponent(query))
-        .then(res => res.json())
-        .then(data => {
-            if (data.length === 0) {
-                resultados.innerHTML = '<p>No se encontraron herramientas.</p>';
-            } else {
-                resultados.innerHTML = data.map(h => {
-                    const color = h.cantidad == 0 ? 'has-background-light' : (h.prestada ? 'has-background-danger-light' : 'has-background-success-light');
-                    const imagenHtml = h.imagen
-                        ? `<img src="${h.imagen}" alt="img" style="width: 50px; height: 50px; object-fit: contain;">`
-                        : `<span class="has-text-grey is-italic" style="width: 50px; display: inline-block; text-align: center; font-size: 0.8rem;">Sin imagen</span>`;
-
-                    const disabledClass = h.cantidad == 0 ? 'has-text-grey-light' : '';
-                    const pointer = h.cantidad == 0 ? 'default' : 'pointer';
-                    const disabledMsg = h.cantidad == 0 ? '<br><em>❌ Sin stock</em>' : '';
-
-                    const esCoincidenciaExacta = h.codigo.toLowerCase() === inputHerramienta.value.trim().toLowerCase();
-                    const extraStyle = esCoincidenciaExacta ? 'border: 2px solid #3273dc; background-color: #eff6ff;' : '';
-                    const estrella = esCoincidenciaExacta ? ' ' : '';
-
-                    return `
-                        <div class="is-flex mb-2 ${color} ${disabledClass}" 
-                                style="align-items: center; gap: 10px; cursor: ${pointer}; ${extraStyle}"
-                                data-id="${h.id}" data-nombre="${h.nombre}" data-codigo="${h.codigo}" data-img="${h.imagen ?? ''}" data-ubi="${h.ubicacion}" data-cantidad="${h.cantidad}">
-                            ${imagenHtml}
-                            <div>
-                                <strong>${estrella}${h.nombre}</strong><br>
-                                <span class="tag is-info is-light is-small">Código: ${h.codigo}</span><br>
-                                <small>📍 ${h.ubicacion} | ${h.cantidad} en stock</small>
-                                ${disabledMsg}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-            resultados.style.display = 'block';
-
-            resultados.querySelectorAll('div[data-id]').forEach(div => {
-                if (parseInt(div.getAttribute('data-cantidad')) === 0) return;
-
-                div.addEventListener('click', () => {
-                    const id = parseInt(div.getAttribute('data-id'));
-                    const nombre = div.getAttribute('data-nombre');
-                    const codigo = div.getAttribute('data-codigo');
-                    const imagen = div.getAttribute('data-img');
-                    const ubicacion = div.getAttribute('data-ubi');
-                    if (!herramientasSeleccionadas.some(h => h.id === id)) {
-                        herramientasSeleccionadas.push({ id, nombre, codigo, imagen, ubicacion });
-                        actualizarVista();
-                    }
-                    inputHerramienta.value = '';
-                    resultados.style.display = 'none';
-                });
-            });
-        });
-});
-
-const inputNombre = document.getElementById('nombre_personalizado');
-const resultadosNombres = document.getElementById('resultados_nombres');
-const sucursalSelect = document.getElementById('sucursal');
-
-inputNombre.addEventListener('input', () => {
-    const query = inputNombre.value.trim();
-    const sucursal = sucursalSelect.value;
-
-    if (query.length < 2) {
-        resultadosNombres.style.display = 'none';
-        resultadosNombres.innerHTML = '';
-        inputNombre.classList.remove('is-danger', 'is-success');
-        return;
-    }
-
-    fetch(`buscar_nombres.php?term=${encodeURIComponent(query)}&sucursal=${encodeURIComponent(sucursal)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.length === 0) {
-                resultadosNombres.innerHTML = '<p>No se encontraron nombres.</p>';
-                inputNombre.classList.add('is-danger');
-                inputNombre.classList.remove('is-success');
-            } else {
-                resultadosNombres.innerHTML = data.map(n => `
-                    <div data-nombre="${n}">
-                        <strong>${n}</strong>
-                    </div>
-                `).join('');
-                inputNombre.classList.remove('is-danger');
-                inputNombre.classList.add('is-success');
-            }
-
-            resultadosNombres.style.display = 'block';
-
-            resultadosNombres.querySelectorAll('div').forEach(div => {
-                div.addEventListener('click', () => {
-                    inputNombre.value = div.getAttribute('data-nombre');
-                    resultadosNombres.style.display = 'none';
-                    inputNombre.classList.add('is-success');
-                    inputNombre.classList.remove('is-danger');
-                });
-            });
-        });
-});
-
-// Cerrar modal al hacer clic fuera de la imagen
-modalImagen.addEventListener('click', () => {
-    modalImagen.style.display = 'none';z
-});
-</script>
