@@ -38,6 +38,16 @@ $comentarios = $conexion->query("
 
 $noLeidosRes = $conexion->query("SELECT COUNT(*) AS total FROM comentarios WHERE leido = 0");
 $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
+
+// Buscar backups
+$backups = [];
+$dir = __DIR__ . '/backups';
+if (is_dir($dir)) {
+    foreach (scandir($dir) as $file) {
+        if (str_ends_with($file, '.sql')) $backups[] = $file;
+    }
+    rsort($backups); // Último arriba
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,6 +55,7 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
     <meta charset="UTF-8">
     <title>Panel del Gerente</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
     <style>
         :root {
             --vw-blue: #00247D;
@@ -73,7 +84,6 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
                         <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>" id="comentario-<?= $c['id'] ?>">
                             <div class="text-gray-800 font-medium">🔧 <?= htmlspecialchars($c['herramienta']) ?> <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span></div>
                             <div class="text-gray-600 italic text-xs mt-1">“<?= htmlspecialchars($c['comentario']) ?>”</div>
-                            <!-- NOMBRE DEL USUARIO/MECÁNICO -->
                             <div class="text-blue-800 text-xs mt-1">Por: <strong><?= htmlspecialchars($c['nombre']) ?></strong></div>
                             <div class="mt-1 text-xs text-gray-500">📍 <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?></div>
                             <div class="mt-1 flex justify-between items-center">
@@ -134,10 +144,45 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
     <?php endif; ?>
 </main>
 
-<div class="mt-12 text-center">
-  <a href="cambiar_credenciales.php" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition">
+<!-- Botones abajo -->
+<div class="mt-12 flex flex-col md:flex-row gap-4 justify-center items-center">
+  <a href="cambiar_credenciales.php" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition text-lg font-semibold">
     🔒 Cambiar contraseña
   </a>
+  <button id="btnBackup" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 transition text-lg font-semibold flex items-center gap-2">
+    <i class="fa-solid fa-database"></i>
+    Backup BD
+  </button>
+  <button id="btnRestaurar" class="inline-block bg-red-600 text-white px-6 py-3 rounded-lg shadow hover:bg-red-700 transition text-lg font-semibold flex items-center gap-2">
+    <i class="fa-solid fa-upload"></i>
+    Actualizar Base de Datos
+  </button>
+</div>
+
+<!-- Toast de éxito/error -->
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg z-50 hidden">
+  Backup generado y guardado en /backups ✅
+</div>
+
+<!-- Modal Restaurar -->
+<div id="modalRestaurar" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-xl p-8 max-w-sm w-full shadow-xl relative">
+    <button type="button" onclick="cerrarModalRestaurar()" class="absolute right-4 top-4 text-gray-400 hover:text-black text-2xl">&times;</button>
+    <h2 class="text-xl font-bold text-red-700 mb-3">⚠ Confirmar Actualización</h2>
+    <p class="mb-2 text-gray-800">Esta acción restaurará la base de datos.<br>
+      <span class="font-semibold text-red-600">¡Se reemplazarán todos los datos actuales!</span>
+    </p>
+    <label class="block mb-2 mt-3 text-gray-700 font-semibold">Elegí el backup:</label>
+    <select id="backupSelect" class="w-full px-4 py-2 border rounded mb-3">
+        <?php foreach ($backups as $file): ?>
+            <option value="<?= htmlspecialchars($file) ?>"><?= htmlspecialchars($file) ?></option>
+        <?php endforeach; ?>
+    </select>
+    <label class="block mb-2 mt-3 text-gray-700 font-semibold">Contraseña de administrador:</label>
+    <input type="password" id="passAdmin" class="w-full px-4 py-2 border rounded mb-3" placeholder="Ingresá la contraseña" autocomplete="off">
+    <div id="restaurarError" class="text-red-600 mb-3 hidden"></div>
+    <button id="confirmRestaurar" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded shadow w-full font-bold">Restaurar Base de Datos</button>
+  </div>
 </div>
 
 <script>
@@ -189,6 +234,95 @@ $noLeidos = $noLeidosRes->fetch_assoc()['total'] ?? 0;
                 }
             });
     }, 30000);
+
+    // --- BACKUP.PHP con alerta ---
+    document.getElementById("btnBackup").addEventListener("click", function() {
+      const btn = this;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando backup...';
+
+      fetch('backup.php')
+        .then(res => res.json())
+        .then(data => {
+          if(data.success) {
+            mostrarToast('Backup generado y guardado en /backups ✅');
+          } else {
+            mostrarToast(data.msg || 'Error al crear el backup', true);
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-database"></i> Backup BD';
+        })
+        .catch(() => {
+          mostrarToast('Error al crear el backup', true);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-database"></i> Backup BD';
+        });
+    });
+
+    function mostrarToast(mensaje, error=false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = mensaje;
+      toast.classList.remove('hidden');
+      toast.classList.remove('bg-green-600','bg-red-600');
+      toast.classList.add(error ? 'bg-red-600' : 'bg-green-600');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3200);
+    }
+
+    // -- RESTAURAR BASE DE DATOS (modal + validación) --
+    function cerrarModalRestaurar() {
+        document.getElementById('modalRestaurar').classList.add('hidden');
+        document.getElementById('passAdmin').value = '';
+        document.getElementById('restaurarError').classList.add('hidden');
+    }
+
+    document.getElementById("btnRestaurar").addEventListener("click", function() {
+        document.getElementById('modalRestaurar').classList.remove('hidden');
+        setTimeout(() => { document.getElementById('passAdmin').focus(); }, 100);
+    });
+
+    document.getElementById("confirmRestaurar").addEventListener("click", function() {
+        const pass = document.getElementById('passAdmin').value.trim();
+        const backup = document.getElementById('backupSelect').value;
+        const errDiv = document.getElementById('restaurarError');
+        errDiv.classList.add('hidden');
+
+        if(pass === "") {
+            errDiv.textContent = "La contraseña es obligatoria.";
+            errDiv.classList.remove('hidden');
+            return;
+        }
+        if(!backup) {
+            errDiv.textContent = "Debés seleccionar un archivo de backup.";
+            errDiv.classList.remove('hidden');
+            return;
+        }
+        this.disabled = true;
+        this.textContent = "Restaurando...";
+
+        fetch('restaurar_backup.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'password=' + encodeURIComponent(pass) + '&backup=' + encodeURIComponent(backup)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                cerrarModalRestaurar();
+                mostrarToast("¡Base de datos restaurada con éxito!");
+            } else {
+                errDiv.textContent = data.msg || "Contraseña incorrecta o error en restauración.";
+                errDiv.classList.remove('hidden');
+            }
+            document.getElementById("confirmRestaurar").disabled = false;
+            document.getElementById("confirmRestaurar").textContent = "Restaurar Base de Datos";
+        })
+        .catch(() => {
+            errDiv.textContent = "Ocurrió un error inesperado.";
+            errDiv.classList.remove('hidden');
+            document.getElementById("confirmRestaurar").disabled = false;
+            document.getElementById("confirmRestaurar").textContent = "Restaurar Base de Datos";
+        });
+    });
 </script>
 </body>
 </html>

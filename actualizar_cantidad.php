@@ -55,115 +55,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
 $resultado = $conexion->query("SELECT * FROM herramientas ORDER BY CAST(codigo AS UNSIGNED) ASC");
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Actualizar Cantidad</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>Actualizar Stock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .modal.is-active {
-            display: flex;
-        }
         .resaltado {
-            background-color: #d4edda !important;
-            transition: background-color 0.5s ease;
+            background-color: #bbf7d0 !important;
+            transition: background-color 0.7s;
         }
+        .modal-imagen { display: none; }
+        .modal-imagen.active { display: flex; }
     </style>
 </head>
-<body class="section">
-    <h1 class="title">Actualizar Cantidad (Stock)</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <div class="flex flex-wrap gap-2 mb-4">
-        <a href="dashboard.php" class="">⬅ Volver al panel</a>
+<div class="max-w-6xl w-full mx-auto my-10 bg-white p-8 rounded-2xl shadow-lg">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-blue-900 flex items-center gap-3">➕ Actualizar Stock de Herramientas</h1>
+        <a href="dashboard.php" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded shadow transition">⬅ Volver al panel</a>
     </div>
-
-    <table class="table is-fullwidth is-striped is-hoverable">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Código</th>
-                <th>Ubicación</th>
-                <th>Cantidad</th>
-                <th>Imagen</th>
-                <th>+1</th>
-                <th>Deshacer</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($h = $resultado->fetch_assoc()) { ?>
-            <tr id="fila-<?= $h['id'] ?>">
-                <td><?= htmlspecialchars($h['nombre']) ?></td>
-                <td><?= htmlspecialchars($h['codigo']) ?></td>
-                <td><?= htmlspecialchars($h['ubicacion']) ?></td>
-                <td>
-                    <span id="cantidad-<?= $h['id'] ?>"><?= $h['cantidad'] ?></span>
-                    <span id="check-<?= $h['id'] ?>" class="icon has-text-success" style="display:none;">
-                        <i class="fas fa-check-circle"></i>
-                    </span>
-                </td>
-                <td>
-                    <?php if (!empty($h['imagen']) && file_exists($h['imagen'])): ?>
-                        <img src="<?= $h['imagen'] ?>" style="width: 50px; cursor: zoom-in;" onclick="mostrarModal('<?= $h['imagen'] ?>')">
-                    <?php else: ?>
-                        <span>Sin imagen</span>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <button class="button is-success" onclick="actualizarCantidad(<?= $h['id'] ?>, 'sumar')">+1</button>
-                </td>
-                <td>
-                    <button class="button is-warning" onclick="actualizarCantidad(<?= $h['id'] ?>, 'deshacer')">Deshacer</button>
-                </td>
-            </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-
-    <div class="modal" id="modalImagen">
-        <div class="modal-background" onclick="cerrarModal()"></div>
-        <div class="modal-content">
-            <p class="image"><img id="imagenAmpliada" src=""></p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <?php while ($h = $resultado->fetch_assoc()) { ?>
+        <div id="fila-<?= $h['id'] ?>" class="bg-blue-50 border border-blue-200 p-6 rounded-xl shadow-sm flex flex-col items-center group relative transition">
+            <div class="w-full flex flex-col items-center mb-2">
+                <?php if (!empty($h['imagen']) && file_exists($h['imagen'])): ?>
+                    <img src="<?= $h['imagen'] ?>" class="w-24 h-24 object-contain rounded-lg border mb-3 shadow cursor-pointer hover:scale-105 transition"
+                        onclick="mostrarModal('<?= $h['imagen'] ?>')" alt="Imagen de <?= htmlspecialchars($h['nombre']) ?>">
+                <?php else: ?>
+                    <div class="w-24 h-24 bg-gray-200 text-gray-400 flex items-center justify-center rounded mb-3">Sin imagen</div>
+                <?php endif; ?>
+                <div class="font-bold text-lg text-blue-900 mb-1"><?= htmlspecialchars($h['nombre']) ?></div>
+                <div class="text-xs text-gray-500 mb-2">(<?= htmlspecialchars($h['codigo']) ?>) - <?= htmlspecialchars($h['ubicacion']) ?></div>
+            </div>
+            <div class="mb-4 flex items-center gap-2">
+                <span class="text-gray-600 text-sm">Cantidad actual:</span>
+                <span id="cantidad-<?= $h['id'] ?>" class="font-bold text-xl"><?= $h['cantidad'] ?></span>
+                <span id="check-<?= $h['id'] ?>" class="ml-1 hidden text-green-600 text-2xl"><i class="fa-solid fa-check-circle"></i></span>
+            </div>
+            <div class="flex gap-2 w-full justify-center">
+                <button class="px-5 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition"
+                    onclick="actualizarCantidad(<?= $h['id'] ?>, 'sumar')">
+                    <i class="fa-solid fa-plus"></i> Sumar
+                </button>
+                <button class="px-5 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg shadow hover:bg-yellow-500 transition"
+                    onclick="actualizarCantidad(<?= $h['id'] ?>, 'deshacer')">
+                    <i class="fa-solid fa-undo"></i> Deshacer
+                </button>
+            </div>
         </div>
-        <button class="modal-close is-large" aria-label="close" onclick="cerrarModal()"></button>
+        <?php } ?>
     </div>
+</div>
 
-    <script>
-        function mostrarModal(src) {
-            document.getElementById("imagenAmpliada").src = src;
-            document.getElementById("modalImagen").classList.add("is-active");
-        }
+<!-- MODAL IMAGEN -->
+<div id="modalImagen" class="modal-imagen fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-50 transition-all" onclick="cerrarModal()">
+    <img id="imagenAmpliada" src="" class="max-h-[70vh] max-w-[90vw] m-auto rounded-lg border-4 border-white shadow-xl">
+</div>
 
-        function cerrarModal() {
-            document.getElementById("modalImagen").classList.remove("is-active");
-        }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<script>
+function mostrarModal(src) {
+    document.getElementById("imagenAmpliada").src = src;
+    document.getElementById("modalImagen").classList.add("active");
+}
+function cerrarModal() {
+    document.getElementById("modalImagen").classList.remove("active");
+}
+function actualizarCantidad(id, accion) {
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('accion', accion);
 
-        function actualizarCantidad(id, accion) {
-            const formData = new FormData();
-            formData.append('id', id);
-            formData.append('accion', accion);
+    fetch('actualizar_cantidad.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.text())
+    .then(nuevaCantidad => {
+        const cantidadSpan = document.getElementById(`cantidad-${id}`);
+        const checkIcon = document.getElementById(`check-${id}`);
+        const fila = document.getElementById(`fila-${id}`);
 
-            fetch('actualizar_cantidad.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.text())
-            .then(nuevaCantidad => {
-                const cantidadSpan = document.getElementById(`cantidad-${id}`);
-                const checkIcon = document.getElementById(`check-${id}`);
-                const fila = document.getElementById(`fila-${id}`);
+        cantidadSpan.innerText = nuevaCantidad;
+        checkIcon.classList.remove('hidden');
+        fila.classList.add('resaltado');
 
-                cantidadSpan.innerText = nuevaCantidad;
-                checkIcon.style.display = "inline";
-                fila.classList.add('resaltado');
-
-                setTimeout(() => {
-                    checkIcon.style.display = "none";
-                    fila.classList.remove('resaltado');
-                }, 1000);
-            });
-        }
-    </script>
+        setTimeout(() => {
+            checkIcon.classList.add('hidden');
+            fila.classList.remove('resaltado');
+        }, 1200);
+    });
+}
+</script>
 </body>
 </html>

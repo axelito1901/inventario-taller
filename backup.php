@@ -1,40 +1,44 @@
 <?php
-$host = 'localhost';
-$usuario = 'root';
-$clave = ''; 
-$bd = 'inventario';
-
-$fecha = date('Y-m-d_H-i-s');
-$archivo = "backups/respaldo_$fecha.sql";
-
-// se crea una carpeta de backups si no existe
-if (!is_dir('backups')) {
-    mkdir('backups', 0777, true);
+session_start();
+if (!isset($_SESSION['gerente'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'msg' => 'No autorizado.']);
+    exit();
 }
 
-// se busca el comando mysqldump en el PATH del sistema
-$mysqldump = trim(shell_exec("where mysqldump")); // busca en el PATH
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-// si no se encuentra, se intenta con la ruta por defecto de XAMPP
-if (!$mysqldump || !file_exists($mysqldump)) {
-    $mysqldump = 'C:\xampp\mysql\bin\mysqldump.exe';
-}
+$backupDir = __DIR__ . '/backups';
+if (!is_dir($backupDir)) mkdir($backupDir, 0777, true);
 
-// si todavia no se encuentra, se muestra un error
-if (!file_exists($mysqldump)) {
-    die("❌ Error: No se encontró <code>mysqldump</code>. Asegurate de tener XAMPP instalado o que esté en el PATH.");
-}
+$fecha = date('d-m-Y_H-i-s');
+$filename = "backup_{$fecha}.sql";
+$filepath = $backupDir . "/" . $filename;
 
-$mysqldump = '"' . $mysqldump . '"';
+// CONFIGURACIÓN XAMPP WINDOWS:
+$dbhost = 'localhost';
+$dbuser = 'root';
+$dbpass = ''; // Tu password, si tenés ponela acá
+$dbname = 'inventario';
+$mysqldump = 'C:\\xampp\\mysql\\bin\\mysqldump.exe'; // Path completo
 
-$comando = "$mysqldump -h $host -u $usuario " . ($clave ? "-p$clave " : "") . "$bd > \"$archivo\"";
+// Comando y salida de error para debug
+$comando = "\"$mysqldump\" --user={$dbuser} --password=\"{$dbpass}\" --host={$dbhost} {$dbname} 2>&1 > " . escapeshellarg($filepath);
 
-system($comando, $resultado);
+$output = [];
+exec($comando, $output, $retval);
 
-// muestra ek resultado
-if ($resultado === 0) {
-    echo "✅ Backup realizado correctamente: <a href='$archivo'>$archivo</a>";
+// Verificar existencia y tamaño (>500 bytes = backup real)
+if (file_exists($filepath) && filesize($filepath) > 500) {
+    echo json_encode(['success' => true, 'archivo' => $filename]);
 } else {
-    echo "❌ Error al crear el backup. Revisá la configuración o permisos.";
+    if (file_exists($filepath)) unlink($filepath); // borra backups vacíos
+    // Dejar error en un archivo para que puedas leerlo
+    file_put_contents(__DIR__ . '/backup_debug.txt', implode("\n", $output));
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'msg' => 'Error al crear el backup. Revisá backup_debug.txt para más detalles.'
+    ]);
 }
 ?>
