@@ -22,7 +22,7 @@ while ($row = $prestadasQuery->fetch_assoc()) {
 <head>
   <meta charset="UTF-8">
   <title>Préstamo de herramienta</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     #boton-flotante {

@@ -54,8 +54,9 @@ if (is_dir($dir)) {
 <head>
     <meta charset="UTF-8">
     <title>Panel del Gerente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <style>
         :root {
             --vw-blue: #00247D;

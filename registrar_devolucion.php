@@ -35,7 +35,7 @@ $prestamos = $conexion->query("
 <head>
     <meta charset="UTF-8">
     <title>Registrar Devolución</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <section class="section">

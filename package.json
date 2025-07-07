@@ -2,8 +2,9 @@
   "name": "inventario-taller",
   "version": "1.0.0",
   "main": "emisor.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css --watch"
   },
   "repository": {
     "type": "git",
@@ -16,8 +17,10 @@
     "url": "https://github.com/axelito1901/inventario-taller/issues"
   },
   "homepage": "https://github.com/axelito1901/inventario-taller#readme",
-  "description": "",
   "dependencies": {
-    "socket.io": "^4.8.1"
-  }
+    "@tailwindcss/cli": "^4.1.11",
+    "socket.io": "^4.8.1",
+    "tailwindcss": "^4.1.11"
+  },
+  "description": ""
 }

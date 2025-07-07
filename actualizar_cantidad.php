@@ -60,7 +60,7 @@ $resultado = $conexion->query("SELECT * FROM herramientas ORDER BY CAST(codigo A
 <head>
     <meta charset="UTF-8">
     <title>Actualizar Stock</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         .resaltado {
             background-color: #bbf7d0 !important;

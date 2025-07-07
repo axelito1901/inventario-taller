@@ -43,7 +43,7 @@ $resultado = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <title>Informe diario</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <section class="section">

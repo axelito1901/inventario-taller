@@ -29,7 +29,7 @@ $prestamos = $conexion->query("
 <head>
     <meta charset="UTF-8">
     <title>Devolver herramienta</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
       body { background: #f6f6f6; }

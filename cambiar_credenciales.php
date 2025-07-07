@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>Cambiar contraseña</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center p-6">
   <div class="bg-white p-8 rounded shadow max-w-md w-full">

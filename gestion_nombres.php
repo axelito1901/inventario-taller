@@ -81,7 +81,7 @@ $osvaldo = $conexion->query("SELECT id, nombre FROM nombres_personalizados ORDER
 <head>
     <meta charset="UTF-8">
     <title>Gestión de nombres</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         mark {
             background-color: yellow;

@@ -58,7 +58,7 @@ if (is_dir($directorio)) {
 <head>
     <meta charset="UTF-8">
     <title>Historial de informes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="css/styles.css">
     <script>
         function confirmar(nombreArchivo) {
             return confirm("¿Querés eliminar el archivo '" + nombreArchivo + "'?");
