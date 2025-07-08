@@ -73,8 +73,8 @@ if (is_dir($dir)) {
     <div class="flex items-center gap-4">
         <!-- Botón mensajes -->
         <div class="relative p-3 rounded border border-blue-300 hover:bg-blue-50 transition">
-            <button id="btnMensajes" class="text-[var(--vw-blue)] hover:text-blue-800 transition text-lg font-bold relative">
-                💬 Comentarios
+            <button id="btnMensajes" class="text-[var(--vw-blue)] hover:text-blue-800 transition text-lg font-bold relative flex items-center gap-2">
+                <i class="fa-solid fa-comments"></i> Comentarios
                 <?php if ($noLeidos > 0): ?>
                     <span class="absolute -top-2 -right-3 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow"><?= $noLeidos ?></span>
                 <?php endif; ?>
@@ -83,39 +83,56 @@ if (is_dir($dir)) {
                 <?php if ($comentarios && $comentarios->num_rows > 0): ?>
                     <?php while ($c = $comentarios->fetch_assoc()): ?>
                         <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>" id="comentario-<?= $c['id'] ?>">
-                            <div class="text-gray-800 font-medium">🔧 <?= htmlspecialchars($c['herramienta']) ?> <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span></div>
-                            <div class="text-gray-600 italic text-xs mt-1">“<?= htmlspecialchars($c['comentario']) ?>”</div>
-                            <div class="text-blue-800 text-xs mt-1">Por: <strong><?= htmlspecialchars($c['nombre']) ?></strong></div>
-                            <div class="mt-1 text-xs text-gray-500">📍 <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?></div>
+                            <div class="text-gray-800 font-medium">
+                                <i class="fa-solid fa-wrench mr-1"></i>
+                                <?= htmlspecialchars($c['herramienta']) ?>
+                                <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span>
+                            </div>
+                            <div class="text-gray-600 italic text-xs mt-1">
+                                <i class="fa-solid fa-quote-left mr-1"></i> <?= htmlspecialchars($c['comentario']) ?>
+                            </div>
+                            <div class="text-blue-800 text-xs mt-1">
+                                <i class="fa-solid fa-user mr-1"></i> Por: <strong><?= htmlspecialchars($c['nombre']) ?></strong>
+                            </div>
+                            <div class="mt-1 text-xs text-gray-500">
+                                <i class="fa-solid fa-location-dot mr-1"></i>
+                                <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?>
+                            </div>
                             <div class="mt-1 flex justify-between items-center">
-                                <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>" class="text-blue-700 text-xs hover:underline">🔎 Ver historial</a>
+                                <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>" class="text-blue-700 text-xs hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Ver historial
+                                </a>
                                 <?php if (!$c['leido']): ?>
-                                    <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)" class="text-xs text-blue-600 hover:underline">✅ Marcar como leído</button>
+                                    <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                                        <i class="fa-solid fa-check"></i> Marcar como leído
+                                    </button>
                                 <?php endif; ?>
                             </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <div class="p-3 text-gray-500">No hay comentarios recientes.</div>
+                    <div class="p-3 text-gray-500"><i class="fa-solid fa-bell-slash"></i> No hay comentarios recientes.</div>
                 <?php endif; ?>
             </div>
         </div>
         <!-- Cerrar sesión -->
-        <a href="logout.php" class="p-3 text-sm text-red-600 rounded border border-red-300 hover:bg-red-300 transition">🚪 Cerrar sesión</a>
+        <a href="logout.php" class="p-3 text-sm text-red-600 rounded border border-red-300 hover:bg-red-300 transition flex items-center gap-1">
+            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+        </a>
     </div>
 </header>
 
 <main class="p-6 max-w-7xl mx-auto">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <a href="listar_herramientas.php" class="bg-[var(--vw-blue)] text-white p-4 rounded-lg shadow hover:bg-blue-900 transition text-center">🔧 Ver herramientas</a>
-        <a href="informe_diario.php" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 transition text-center">📅 Informe diario</a>
-        <a href="exportar_informe_excel.php" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 transition text-center">📁 Exportar Excel</a>
-        <a href="historial_informes.php" class="bg-gray-800 text-white p-4 rounded-lg shadow hover:bg-gray-900 transition text-center">🗂 Historial informes</a>
-        <a href="actualizar_cantidad.php" class="inline-block bg-red-400 text-white p-4 rounded-lg shadow hover:bg-red-500 transition text-center">➕ Controlar Stock</a>
-        <a href="gestion_nombres.php" class="bg-yellow-400 text-black p-4 rounded-lg shadow hover:bg-yellow-500 transition text-center">👤 Gestionar nombres</a>
+        <a href="listar_herramientas.php" class="bg-[var(--vw-blue)] text-white p-4 rounded-lg shadow hover:bg-blue-900 transition text-center flex items-center justify-center gap-2"><i class="fa-solid fa-wrench"></i> Ver herramientas</a>
+        <a href="informe_diario.php" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 transition text-center flex items-center justify-center gap-2"><i class="fa-solid fa-calendar-days"></i> Informe diario</a>
+        <a href="exportar_informe_excel.php" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 transition text-center flex items-center justify-center gap-2"><i class="fa-solid fa-file-excel"></i> Exportar Excel</a>
+        <a href="historial_informes.php" class="bg-gray-800 text-white p-4 rounded-lg shadow hover:bg-gray-900 transition text-center flex items-center justify-center gap-2"><i class="fa-solid fa-folder-open"></i> Historial informes</a>
+        <a href="actualizar_cantidad.php" class="inline-block bg-red-400 text-white p-4 rounded-lg shadow hover:bg-red-500 transition text-center flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i> Controlar Stock</a>
+        <a href="gestion_nombres.php" class="bg-yellow-400 text-black p-4 rounded-lg shadow hover:bg-yellow-500 transition text-center flex items-center justify-center gap-2"> <i class="fa-solid fa-users"></i> Gestionar nombres</a>
     </div>
 
-    <h2 class="text-2xl font-semibold text-[var(--vw-blue)] mb-4">Préstamos activos</h2>
+    <h2 class="text-2xl font-semibold text-[var(--vw-blue)] mb-4 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Préstamos activos</h2>
 
     <?php if ($prestamos->num_rows > 0): ?>
         <div class="overflow-x-auto">
@@ -147,9 +164,7 @@ if (is_dir($dir)) {
 
 <!-- Botones abajo -->
 <div class="mt-12 flex flex-col md:flex-row gap-4 justify-center items-center">
-  <a href="cambiar_credenciales.php" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition text-lg font-semibold">
-    🔒 Cambiar contraseña
-  </a>
+  <a href="cambiar_credenciales.php" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition text-lg font-semibold flex items-center gap-2"><i class="fa-solid fa-lock"></i> Cambiar contraseña</a>
   <button id="btnBackup" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 transition text-lg font-semibold flex items-center gap-2">
     <i class="fa-solid fa-database"></i>
     Backup BD
@@ -161,15 +176,21 @@ if (is_dir($dir)) {
 </div>
 
 <!-- Toast de éxito/error -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg z-50 hidden">
-  Backup generado y guardado en /backups ✅
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg z-50 hidden flex items-center gap-2">
+  <i class="fa-solid fa-check-circle"></i>
+  Backup generado y guardado en /backups
 </div>
+
 
 <!-- Modal Restaurar -->
 <div id="modalRestaurar" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-xl p-8 max-w-sm w-full shadow-xl relative">
-    <button type="button" onclick="cerrarModalRestaurar()" class="absolute right-4 top-4 text-gray-400 hover:text-black text-2xl">&times;</button>
-    <h2 class="text-xl font-bold text-red-700 mb-3">⚠ Confirmar Actualización</h2>
+      <div class="bg-white rounded-xl p-8 max-w-sm w-full shadow-xl relative">
+        <button type="button" onclick="cerrarModalRestaurar()" class="absolute right-4 top-4 text-gray-400 hover:text-black text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2 class="text-xl font-bold text-red-700 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Confirmar Actualización
+        </h2>
     <p class="mb-2 text-gray-800">Esta acción restaurará la base de datos.<br>
       <span class="font-semibold text-red-600">¡Se reemplazarán todos los datos actuales!</span>
     </p>
@@ -246,7 +267,7 @@ if (is_dir($dir)) {
         .then(res => res.json())
         .then(data => {
           if(data.success) {
-            mostrarToast('Backup generado y guardado en /backups ✅');
+            mostrarToast('Backup generado y guardado en /backups');
           } else {
             mostrarToast(data.msg || 'Error al crear el backup', true);
           }
@@ -262,9 +283,13 @@ if (is_dir($dir)) {
 
     function mostrarToast(mensaje, error=false) {
       const toast = document.getElementById('toast');
-      toast.textContent = mensaje;
+
+      let iconHtml = error
+        ? '<i class="fa-solid fa-xmark mr-2"></i>'
+        : '<i class="fa-solid fa-check-circle mr-2"></i>';
+      toast.innerHTML = iconHtml + mensaje;
       toast.classList.remove('hidden');
-      toast.classList.remove('bg-green-600','bg-red-600');
+      toast.classList.remove('bg-green-600', 'bg-red-600');
       toast.classList.add(error ? 'bg-red-600' : 'bg-green-600');
       setTimeout(() => { toast.classList.add('hidden'); }, 3200);
     }

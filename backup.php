@@ -20,7 +20,7 @@ $dbhost = 'localhost';
 $dbuser = 'root';
 $dbpass = ''; // Tu password, si tenés ponela acá
 $dbname = 'inventario';
-$mysqldump = 'C:\\xampp\\mysql\\bin\\mysqldump.exe'; // Path completo
+$mysqldump = 'F:\\xampp\\mysql\\bin\\mysqldump.exe'; // Path completo
 
 // Comando y salida de error para debug
 $comando = "\"$mysqldump\" --user={$dbuser} --password=\"{$dbpass}\" --host={$dbhost} {$dbname} 2>&1 > " . escapeshellarg($filepath);

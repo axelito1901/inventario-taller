@@ -50,7 +50,7 @@ $dbhost = 'localhost';
 $dbuser = 'root';
 $dbpass = ''; // tu pass MySQL
 $dbname = 'inventario';
-$mysql = 'C:\\xampp\\mysql\\bin\\mysql.exe'; // ruta absoluta a mysql.exe
+$mysql = 'F:\\xampp\\mysql\\bin\\mysql.exe'; // ruta absoluta a mysql.exe
 
 // Ejecutar restauración
 $comando = "\"$mysql\" --user={$dbuser} --password=\"{$dbpass}\" --host={$dbhost} {$dbname} < " . escapeshellarg($filepath) . " 2>&1";
