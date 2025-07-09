@@ -27,7 +27,7 @@ $sql .= " ORDER BY p.fecha_hora DESC";
 $stmt = $sucursal === 'todas'
     ? $conexion->prepare($sql)
     : $conexion->prepare($sql);
-    
+
 if ($sucursal === 'todas') {
     $stmt->bind_param("s", $fecha);
 } else {
@@ -37,78 +37,109 @@ if ($sucursal === 'todas') {
 $stmt->execute();
 $resultado = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Informe diario</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-<div class="container">
-    <h1 class="title is-3">Informe de préstamos</h1>
+<body class="bg-[var(--vw-gray)] min-h-screen text-gray-800 font-sans">
+<div class="max-w-5xl mx-auto p-6">
+    <div class="flex items-center gap-3 mb-6">
+        <img src="logo-volskwagen.png" alt="Logo" class="h-12 w-auto drop-shadow">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--vw-blue)] tracking-tight">Informe de préstamos</h1>
+    </div>
 
-    <form method="GET" class="box">
-        <div class="columns is-multiline">
-            <div class="column is-4">
-                <label class="label">Sucursal</label>
-                <div class="select is-fullwidth">
-                    <select name="sucursal">
+    <div class="bg-white p-6 rounded-2xl shadow border border-gray-200 mb-8">
+        <form method="GET" class="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
+            <div class="flex-1">
+                <label class="font-semibold text-[var(--vw-blue)] mb-1 block">Sucursal</label>
+                <div class="relative">
+                    <select name="sucursal" class="border-2 border-gray-200 rounded-lg px-4 py-2 pr-10 w-full focus:ring-2 focus:ring-[var(--vw-blue)] focus:border-blue-400 outline-none appearance-none">
                         <option value="todas" <?= $sucursal === 'todas' ? 'selected' : '' ?>>Todas</option>
                         <option value="Lanús" <?= $sucursal === 'Lanús' ? 'selected' : '' ?>>Lanús</option>
                         <option value="Osvaldo Cruz" <?= $sucursal === 'Osvaldo Cruz' ? 'selected' : '' ?>>Osvaldo Cruz</option>
                     </select>
+                    <i class="fa-solid text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
             </div>
-            <div class="column is-4 is-flex is-align-items-end">
-                <button class="button is-link">🔎 Ver informe</button>
+            <div class="flex-1">
+                <label class="font-semibold text-[var(--vw-blue)] mb-1 block">Fecha</label>
+                <div class="relative">
+                    <input type="date" name="fecha" value="<?= htmlspecialchars($fecha) ?>" class="border-2 border-gray-200 rounded-lg px-4 py-2 pr-10 w-full focus:ring-2 focus:ring-[var(--vw-blue)] focus:border-blue-400 outline-none">
+                    <i class="fa-solid text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
             </div>
-        </div>
-    </form>
+            <div class="flex-shrink-0 mt-3 md:mt-0 flex items-end">
+                <button class="bg-[var(--vw-blue)] hover:bg-blue-900 text-white px-6 py-2 rounded-lg font-bold shadow transition flex items-center gap-2 w-full md:w-auto">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Ver informe</span>
+                </button>
+            </div>
+        </form>
+    </div>
 
-    <div class="buttons mb-4">
-        <a href="dashboard.php" class="button is-light">⬅ Volver al panel</a>
+
+    <div class="mb-6">
+        <a href="dashboard.php" class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-100 text-[var(--vw-blue)] px-5 py-3 rounded-lg shadow font-semibold transition">
+            <i class="fa-solid fa-arrow-left"></i> Volver al panel
+        </a>
     </div>
 
     <?php if ($resultado->num_rows > 0): ?>
-        <table class="table is-striped is-fullwidth">
-            <thead>
+    <div class="overflow-x-auto bg-white rounded-2xl shadow border border-gray-200">
+        <table class="min-w-full border-collapse">
+            <thead class="sticky top-0 z-10 bg-[var(--vw-blue)] text-white shadow-sm">
                 <tr>
-                    <th>Herramienta</th>
-                    <th>Retirado por</th>
-                    <th>Sucursal</th>
-                    <th>Hora préstamo</th>
-                    <th>Estado</th>
-                    <th>Hora devolución</th>
+                    <th class="px-4 py-3 text-left font-semibold">Herramienta</th>
+                    <th class="px-4 py-3 text-left font-semibold">Retirado por</th>
+                    <th class="px-4 py-3 text-left font-semibold">Sucursal</th>
+                    <th class="px-4 py-3 text-left font-semibold">Hora préstamo</th>
+                    <th class="px-4 py-3 text-left font-semibold">Estado</th>
+                    <th class="px-4 py-3 text-left font-semibold">Hora devolución</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = $resultado->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['herramienta']) ?></td>
-                        <td><?= htmlspecialchars($row['mecanico'] ?? $row['nombre_personalizado']) ?></td>
-                        <td><?= htmlspecialchars($row['sucursal']) ?></td>
-                        <td><?= date('H:i', strtotime($row['fecha_hora'])) ?></td>
-                        <td>
+                    <tr class="border-b border-gray-200 hover:bg-blue-50 transition">
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['herramienta']) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['mecanico'] ?? $row['nombre_personalizado']) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($row['sucursal']) ?></td>
+                        <td class="px-4 py-3"><?= date('H:i', strtotime($row['fecha_hora'])) ?></td>
+                        <td class="px-4 py-3">
                             <?php if ($row['devuelta']): ?>
-                                <span class="tag is-success">Devuelta</span>
+                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold shadow-sm text-sm">
+                                    <i class="fa-solid fa-check-circle"></i> Devuelta
+                                </span>
                             <?php else: ?>
-                                <span class="tag is-warning">Activa</span>
+                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold shadow-sm text-sm">
+                                    <i class="fa-solid fa-hourglass-half"></i> Activa
+                                </span>
                             <?php endif; ?>
                         </td>
-                        <td>
+                        <td class="px-4 py-3">
                             <?= $row['devuelta'] ? date('H:i', strtotime($row['fecha_devolucion'])) : '-' ?>
                         </td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
+    </div>
     <?php else: ?>
-        <div class="notification is-info">No se encontraron préstamos para esta sucursal.</div>
+        <div class="p-6 bg-blue-100 text-blue-800 rounded-lg shadow font-semibold text-lg mt-6">
+            No se encontraron préstamos para esta sucursal.
+        </div>
     <?php endif; ?>
 </div>
-</section>
+<script src="fontawesome/js/all.min.js"></script>
 </body>
 </html>

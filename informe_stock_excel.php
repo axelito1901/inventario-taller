@@ -67,16 +67,72 @@ $writer->save($rutaArchivo);
     <meta charset="UTF-8">
     <title>Informe generado</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        }
+        .container {
+            max-width: 480px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 24px 0 rgba(0,0,0,0.07);
+            padding: 2.5rem 2rem 2rem 2rem;
+        }
+        .notification {
+            background: #e6f9ed;
+            color: #1a7f37;
+            border-radius: 1rem;
+            padding: 1.2rem 1rem;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            border: 1px solid #b6e7c9;
+            text-align: center;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: none;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+        .button.is-success {
+            background: #1a7f37;
+            color: #fff;
+        }
+        .button.is-success:hover {
+            background: #176c2e;
+        }
+        .button.is-light {
+            background: #f4f4f4;
+            color: #222;
+            border: 1px solid #e0e0e0;
+        }
+        .button.is-light:hover {
+            background: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
-<section class="section">
+<section>
     <div class="container">
-        <div class="notification is-success">
+        <div class="notification">
             El informe fue generado correctamente como <strong><?= $nombreArchivo ?></strong>.
         </div>
         <div class="buttons">
-            <a class="button is-success" href="<?= $rutaArchivo ?>" download>📥 Descargar informe</a>
-            <a class="button is-light" href="informe_stock.php">⬅ Volver al informe</a>
+            <a class="button is-success" href="<?= $rutaArchivo ?>" download>Descargar informe</a>
+            <a class="button is-light" href="informe_stock.php">Volver al informe</a>
         </div>
     </div>
 </section>

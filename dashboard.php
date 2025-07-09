@@ -62,6 +62,157 @@ if (is_dir($dir)) {
             --vw-blue: #00247D;
             --vw-gray: #F4F4F4;
         }
+        .vw-card {
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 4px 24px #0001;
+        }
+        .vw-min-row {
+            border-bottom: 1.5px solid #f4f7fb;
+            transition: background 0.15s;
+        }
+        .vw-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            background: #e7f3ff;
+            color: #1363c6;
+            font-weight: 500;
+            padding: 0.3em 1.1em;
+            border-radius: 1em;
+            font-size: 0.99em;
+        }
+        /* Modern panel de comentarios */
+        #panelMensajes {
+            min-width: 340px;
+        }
+        #panelMensajes .comentario-burbuja {
+            border-radius: 1.2rem;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+            border-left: 4px solid #e7f3ff;
+            padding: 1.1rem 1.2rem 0.7rem 1.2rem;
+        }
+        #panelMensajes .comentario-burbuja.no-leido {
+            background: #fffbe7;
+            border-left: 4px solid #facc15;
+        }
+        #panelMensajes .comentario-burbuja .herramienta {
+            background: #e7f3ff;
+            color: var(--vw-blue);
+            font-weight: 600;
+            padding: 0.2em 0.9em;
+            border-radius: 1em;
+            font-size: 0.97em;
+            margin-right: 0.5em;
+        }
+        #panelMensajes .comentario-burbuja .codigo {
+            color: #b0b0b0;
+            font-size: 0.93em;
+            font-family: monospace;
+        }
+        #panelMensajes .comentario-burbuja .comentario {
+            color: #444;
+            font-style: italic;
+            border-left: 2.5px solid #b3d1fa;
+            margin: 0.7em 0 0.5em 0;
+            padding-left: 0.8em;
+            font-size: 1em;
+            transition: max-height 0.2s;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+        .comentario-collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-height: 4.5em;
+            position: relative;
+            transition: max-height 0.2s;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+        .comentario-expanded {
+            display: block !important;
+            max-height: 1000px;
+            transition: max-height 0.2s;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+        .ver-mas-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            color: #1363c6;
+            transition: color 0.15s;
+        }
+        .ver-mas-btn:hover {
+            color: #0a3a7a;
+            text-decoration: underline;
+        }
+        #panelMensajes .comentario-burbuja .info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.93em;
+            color: #6b7280;
+        }
+        #panelMensajes .comentario-burbuja .acciones {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.7em;
+        }
+        #panelMensajes .comentario-burbuja .acciones a,
+        #panelMensajes .comentario-burbuja .acciones button {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--vw-blue);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.15s;
+        }
+        #panelMensajes .comentario-burbuja .acciones a:hover,
+        #panelMensajes .comentario-burbuja .acciones button:hover {
+            color: #0a3a7a;
+            text-decoration: underline;
+        }
+        #panelMensajes .panel-header {
+            padding: 1rem 1.2rem 0.7rem 1.2rem;
+            border-bottom: 1.5px solid #e7f3ff;
+            background: linear-gradient(90deg, #e7f3ff 0%, #fff 100%);
+            border-top-left-radius: 1.2rem;
+            border-top-right-radius: 1.2rem;
+            font-weight: bold;
+            color: var(--vw-blue);
+            font-size: 1.08em;
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+        }
+        #panelMensajes .no-comentarios {
+            padding: 2.5rem 1.2rem;
+            color: #b0b0b0;
+            text-align: center;
+        }
+        /* Badge notificación */
+        .badge-notificacion {
+            position: absolute;
+            top: -0.7em;
+            right: -0.9em;
+            background: #e11d48;
+            color: #fff;
+            font-size: 0.85em;
+            padding: 0.2em 0.7em;
+            border-radius: 999px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body class="bg-[var(--vw-gray)] text-gray-800 min-h-screen">
@@ -76,42 +227,43 @@ if (is_dir($dir)) {
             <button id="btnMensajes" class="text-[var(--vw-blue)] hover:text-blue-800 transition text-lg font-bold relative flex items-center gap-2">
                 <i class="fa-solid fa-comments"></i> Comentarios
                 <?php if ($noLeidos > 0): ?>
-                    <span class="absolute -top-2 -right-3 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow"><?= $noLeidos ?></span>
+                    <span class="badge-notificacion"><?= $noLeidos ?></span>
                 <?php endif; ?>
             </button>
-            <div id="panelMensajes" class="hidden absolute right-0 mt-2 w-96 bg-white border border-gray-300 rounded shadow z-50 max-h-96 overflow-y-auto text-sm">
+            <!-- PANEL MODERNO DE MENSAJES -->
+            <div id="panelMensajes" class="hidden absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-2xl shadow-lg z-50 max-h-96 overflow-y-auto text-sm p-0">
                 <?php if ($comentarios && $comentarios->num_rows > 0): ?>
+                    <div class="panel-header">
+                        <i class="fa-solid fa-comments"></i> Últimos comentarios
+                    </div>
+                    <div>
                     <?php while ($c = $comentarios->fetch_assoc()): ?>
-                        <div class="p-3 border-b <?= $c['leido'] ? '' : 'bg-yellow-50' ?>" id="comentario-<?= $c['id'] ?>">
-                            <div class="text-gray-800 font-medium">
-                                <i class="fa-solid fa-wrench mr-1"></i>
-                                <?= htmlspecialchars($c['herramienta']) ?>
-                                <span class="text-xs text-gray-500">(<?= htmlspecialchars($c['codigo']) ?>)</span>
+                        <div class="comentario-burbuja<?= $c['leido'] ? '' : ' no-leido' ?>" id="comentario-<?= $c['id'] ?>">
+                            <div>
+                                <span class="herramienta"><?= htmlspecialchars($c['herramienta']) ?></span>
+                                <span class="codigo">(<?= htmlspecialchars($c['codigo']) ?>)</span>
                             </div>
-                            <div class="text-gray-600 italic text-xs mt-1">
-                                <i class="fa-solid fa-quote-left mr-1"></i> <?= htmlspecialchars($c['comentario']) ?>
+                            <div class="comentario comentario-collapsed" id="comentario-texto-<?= $c['id'] ?>">
+                                <?= htmlspecialchars($c['comentario']) ?>
                             </div>
-                            <div class="text-blue-800 text-xs mt-1">
-                                <i class="fa-solid fa-user mr-1"></i> Por: <strong><?= htmlspecialchars($c['nombre']) ?></strong>
+                            <?php if (mb_strlen($c['comentario']) > 120): ?>
+                                <button class="ver-mas-btn text-blue-700 font-semibold text-xs mt-1" data-id="<?= $c['id'] ?>">Ver más</button>
+                            <?php endif; ?>
+                            <div class="info">
+                                <span>Por <strong style="color:#1363c6"><?= htmlspecialchars($c['nombre']) ?></strong> — <?= htmlspecialchars($c['sucursal']) ?></span>
+                                <span><?= date('d/m H:i', strtotime($c['fecha'])) ?></span>
                             </div>
-                            <div class="mt-1 text-xs text-gray-500">
-                                <i class="fa-solid fa-location-dot mr-1"></i>
-                                <?= htmlspecialchars($c['sucursal']) ?> - <?= $c['fecha'] ?>
-                            </div>
-                            <div class="mt-1 flex justify-between items-center">
-                                <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>" class="text-blue-700 text-xs hover:underline flex items-center gap-1">
-                                    <i class="fa-solid fa-magnifying-glass"></i> Ver historial
-                                </a>
+                            <div class="acciones">
+                                <a href="historial_herramienta.php?id=<?= $c['herramienta_id'] ?>">Ver historial</a>
                                 <?php if (!$c['leido']): ?>
-                                    <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
-                                        <i class="fa-solid fa-check"></i> Marcar como leído
-                                    </button>
+                                    <button onclick="marcarComoLeido(<?= $c['id'] ?>, this)">Marcar como leído</button>
                                 <?php endif; ?>
                             </div>
                         </div>
                     <?php endwhile; ?>
+                    </div>
                 <?php else: ?>
-                    <div class="p-3 text-gray-500"><i class="fa-solid fa-bell-slash"></i> No hay comentarios recientes.</div>
+                    <div class="no-comentarios">No hay comentarios recientes.</div>
                 <?php endif; ?>
             </div>
         </div>
@@ -135,31 +287,38 @@ if (is_dir($dir)) {
     <h2 class="text-2xl font-semibold text-[var(--vw-blue)] mb-4 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Préstamos activos</h2>
 
     <?php if ($prestamos->num_rows > 0): ?>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white rounded-lg shadow text-sm">
-                <thead class="bg-[var(--vw-blue)] text-white">
-                    <tr>
-                        <th class="px-4 py-2 text-left">Herramienta</th>
-                        <th class="px-4 py-2 text-left">Prestado por</th>
-                        <th class="px-4 py-2 text-left">Sucursal</th>
-                        <th class="px-4 py-2 text-left">Fecha y hora</th>
+    <div class="overflow-x-auto vw-card px-0 py-0 mb-2">
+        <table class="min-w-full bg-transparent text-base">
+            <thead>
+                <tr>
+                    <th class="py-3 px-5 font-semibold text-left bg-[var(--vw-blue)] text-white border-0 rounded-tl-2xl">Herramienta</th>
+                    <th class="py-3 px-5 font-semibold text-left bg-[var(--vw-blue)] text-white border-0">Prestado por</th>
+                    <th class="py-3 px-5 font-semibold text-left bg-[var(--vw-blue)] text-white border-0">Sucursal</th>
+                    <th class="py-3 px-5 font-semibold text-left bg-[var(--vw-blue)] text-white border-0">Fecha y hora</th>
+                    <th class="py-3 px-5 font-semibold text-left bg-[var(--vw-blue)] text-white border-0 rounded-tr-2xl">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $prestamos->fetch_assoc()): ?>
+                    <tr class="vw-min-row hover:bg-[#f4f7fb] transition-all">
+                        <td class="py-3 px-5"><?= htmlspecialchars($row['herramienta']) ?></td>
+                        <td class="py-3 px-5"><?= $row['mecanico'] ?? htmlspecialchars($row['nombre_personalizado']) ?></td>
+                        <td class="py-3 px-5"><?= htmlspecialchars($row['sucursal']) ?></td>
+                        <td class="py-3 px-5"><?= htmlspecialchars($row['fecha_hora']) ?></td>
+                        <td class="py-3 px-5">
+                            <span class="vw-pill bg-blue-100 text-[var(--vw-blue)] px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-hourglass-half"></i> Activo
+                            </span>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $prestamos->fetch_assoc()): ?>
-                        <tr class="border-b hover:bg-[var(--vw-gray)]">
-                            <td class="px-4 py-2"><?= htmlspecialchars($row['herramienta']) ?></td>
-                            <td class="px-4 py-2"><?= $row['mecanico'] ?? htmlspecialchars($row['nombre_personalizado']) ?></td>
-                            <td class="px-4 py-2"><?= htmlspecialchars($row['sucursal']) ?></td>
-                            <td class="px-4 py-2"><?= htmlspecialchars($row['fecha_hora']) ?></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
     <?php else: ?>
-        <div class="p-4 bg-blue-100 text-blue-800 rounded-lg shadow-sm">No hay préstamos activos en este momento.</div>
+        <div class="p-4 bg-blue-50 text-blue-800 rounded-lg shadow-sm">No hay préstamos activos en este momento.</div>
     <?php endif; ?>
+
 </main>
 
 <!-- Botones abajo -->
@@ -180,7 +339,6 @@ if (is_dir($dir)) {
   <i class="fa-solid fa-check-circle"></i>
   Backup generado y guardado en /backups
 </div>
-
 
 <!-- Modal Restaurar -->
 <div id="modalRestaurar" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
@@ -221,6 +379,7 @@ if (is_dir($dir)) {
         }
     });
 
+    // ---------- MODIFICADO: badge se actualiza instantáneamente ----------
     function marcarComoLeido(id, btn) {
         fetch('marcar_leido.php', {
             method: 'POST',
@@ -230,24 +389,38 @@ if (is_dir($dir)) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                const contenedor = btn.closest('.p-3');
-                contenedor.classList.remove('bg-yellow-50');
+                const contenedor = btn.closest('.comentario-burbuja');
+                contenedor.classList.remove('no-leido');
                 btn.remove();
+
+                // ACTUALIZA EL CONTADOR DEL BADGE EN TIEMPO REAL
+                const btnMensajes = document.getElementById('btnMensajes');
+                const burbuja = btnMensajes.querySelector('.badge-notificacion');
+                if (burbuja) {
+                    let numero = parseInt(burbuja.textContent, 10) || 0;
+                    numero--;
+                    if (numero <= 0) {
+                        burbuja.remove();
+                    } else {
+                        burbuja.textContent = numero;
+                    }
+                }
             }
         });
     }
+    // ---------------------------------------------------------------------
 
     setInterval(() => {
         fetch('contar_no_leidos.php')
             .then(res => res.json())
             .then(data => {
                 const btn = document.getElementById('btnMensajes');
-                let burbuja = btn.querySelector('span');
+                let burbuja = btn.querySelector('.badge-notificacion');
 
                 if (data.total > 0) {
                     if (!burbuja) {
                         burbuja = document.createElement('span');
-                        burbuja.className = 'absolute -top-2 -right-3 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow';
+                        burbuja.className = 'badge-notificacion';
                         btn.appendChild(burbuja);
                     }   
                     burbuja.textContent = data.total;
@@ -349,6 +522,26 @@ if (is_dir($dir)) {
             document.getElementById("confirmRestaurar").textContent = "Restaurar Base de Datos";
         });
     });
+
+    // --------- VER MÁS / VER MENOS en comentarios ---------
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.ver-mas-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const texto = document.getElementById('comentario-texto-' + id);
+                if (texto.classList.contains('comentario-collapsed')) {
+                    texto.classList.remove('comentario-collapsed');
+                    texto.classList.add('comentario-expanded');
+                    this.textContent = 'Ver menos';
+                } else {
+                    texto.classList.add('comentario-collapsed');
+                    texto.classList.remove('comentario-expanded');
+                    this.textContent = 'Ver más';
+                }
+            });
+        });
+    });
+    // ------------------------------------------------------
 </script>
 </body>
 </html>

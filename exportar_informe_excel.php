@@ -55,26 +55,43 @@ while ($row = $resultado->fetch_assoc()) {
 $contenido .= "</table>";
 file_put_contents($rutaArchivo, $contenido);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Informe generado</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <style>
+        :root {
+            --vw-blue: #00247D;
+            --vw-gray: #F4F4F4;
+        }
+    </style>
 </head>
-<body>
-<section class="section">
-    <div class="container">
-        <div class="notification is-success">
-            El informe fue generado correctamente como <strong><?= $nombreArchivo ?></strong>.
-        </div>
-        <div class="buttons">
-            <a class="button is-link" href="<?= $rutaArchivo ?>" download>📁 Descargar informe</a>
-            <a class="button is-light" href="dashboard.php">⬅ Volver al panel</a>
+<body class="bg-[var(--vw-gray)] min-h-screen text-gray-800 font-sans flex flex-col items-center justify-center">
+    <div class="max-w-xl w-full mx-auto mt-32 bg-white p-8 rounded-2xl shadow border border-gray-200 flex flex-col items-center">
+        <img src="logo-volskwagen.png" alt="Logo" class="h-16 w-auto mb-6 drop-shadow">
+        <h1 class="text-2xl font-extrabold text-[var(--vw-blue)] mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-file-excel text-green-600"></i>
+            Informe generado
+        </h1>
+        <p class="text-gray-700 text-lg mb-6 text-center">
+            El informe fue generado correctamente como<br>
+            <span class="font-bold text-[var(--vw-blue)]"><?= htmlspecialchars($nombreArchivo) ?></span>
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            <a class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-semibold flex items-center gap-2 transition shadow w-full justify-center"
+               href="<?= htmlspecialchars($rutaArchivo) ?>" download>
+                <i class="fa-solid fa-download"></i> Descargar informe
+            </a>
+            <a class="bg-[var(--vw-blue)] hover:bg-blue-900 text-white px-5 py-3 rounded-lg font-semibold flex items-center gap-2 transition shadow w-full justify-center"
+               href="dashboard.php">
+                <i class="fa-solid fa-arrow-left"></i> Volver al panel
+            </a>
         </div>
     </div>
-</section>
+    <script src="fontawesome/js/all.min.js"></script>
 </body>
 </html>
-    
