@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['devolver_id'])) {
 }
 
 $prestamos = $conexion->query("
-    SELECT p.id, h.nombre AS herramienta, h.codigo, p.fecha_hora, m.nombre AS mecanico, p.nombre_personalizado, p.sucursal
+    SELECT p.id, h.nombre AS herramienta, h.codigo, h.ubicacion, p.fecha_hora, m.nombre AS mecanico, p.nombre_personalizado, p.sucursal
     FROM prestamos p
     LEFT JOIN herramientas h ON p.herramienta_id = h.id
     LEFT JOIN mecanicos m ON p.mecanico_id = m.id
@@ -52,9 +52,7 @@ $prestamos = $conexion->query("
         --vw-blue: #00247D;
         --vw-gray: #F4F4F4;
       }
-      body { 
-        background: var(--vw-gray); 
-      }
+      body { background: var(--vw-gray); }
       header.header-fixed-vw {
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         border-bottom: 1px solid #e5e7eb;
@@ -115,9 +113,21 @@ $prestamos = $conexion->query("
       .btn-devolver {
         background: #fbbf24;
         color: #92400e;
-        font-size: 0.9em;
-        padding: 0.5em 1em;
+        font-size: 1.02em;
+        padding: 0.5em 1.7em; /* Aumenta el padding horizontal */
+        font-weight: 600;
+        border-radius: .7em;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .6em;
+        justify-content: center;
+        transition: background .15s, color .15s;
+        min-width: 120px;
+        white-space: nowrap;
       }
+
       .btn-devolver:hover {
         background: #f59e0b;
         color: #78350f;
@@ -125,23 +135,42 @@ $prestamos = $conexion->query("
       .tabla-prestamos {
         background: #fff;
         border-radius: 1em;
-        overflow: hidden;
+        overflow-x: auto;
         box-shadow: 0 2px 8px #0001;
         border: 1px solid #e5e7eb;
+        width: 100%;
+      }
+      .tabla-prestamos th, .tabla-prestamos td {
+        padding: 1em 0.7em;
+        text-align: left;
+        vertical-align: top;
+        word-break: break-word;
       }
       .tabla-prestamos th {
         background: var(--vw-blue);
         color: #fff;
         font-weight: 600;
-        padding: 1em 0.8em;
-        text-align: left;
+        white-space: nowrap;
       }
-      .tabla-prestamos td {
-        padding: 1em 0.8em;
+      .tabla-prestamos tr {
         border-bottom: 1px solid #f3f4f6;
       }
       .tabla-prestamos tr:hover {
         background: #f8fafc;
+      }
+      .tabla-prestamos td textarea {
+        width: 100%;
+        min-width: 140px;
+        max-width: 220px;
+        min-height: 48px;
+        font-size: 0.98em;
+      }
+      .codigo-txt {
+        font-size: .92em;
+        color: #666;
+        margin-top: 2px;
+        display: block;
+        white-space: nowrap;
       }
       .sucursal-lanus { color: #dc2626; font-weight: 600; }
       .sucursal-oc { color: #2563eb; font-weight: 600; }
@@ -150,12 +179,13 @@ $prestamos = $conexion->query("
         padding: 0.5em;
         border: 1px solid #d1d5db;
         border-radius: 0.5em;
-        font-size: 0.9em;
+        font-size: 0.97em;
         outline: none;
         transition: border 0.15s;
         background: #f9fafb;
         resize: vertical;
-        min-height: 60px;
+        min-height: 48px;
+        max-width: 220px;
       }
       .comentario-input:focus {
         border-color: var(--vw-blue);
@@ -230,6 +260,15 @@ $prestamos = $conexion->query("
       .modal-confirm .btn-cancel:hover {
         background: #e5e7eb;
       }
+      /* Responsive */
+      @media (max-width: 900px) {
+        .tabla-prestamos th, .tabla-prestamos td { font-size: 0.97em; padding: .7em .4em; }
+        .comentario-input { min-width: 80px; max-width: 140px; }
+      }
+      @media (max-width: 600px) {
+        .tabla-prestamos th, .tabla-prestamos td { font-size: .93em; padding: .6em .2em; }
+        .comentario-input { min-width: 60px; max-width: 100px; }
+      }
     </style>
 </head>
 <body class="bg-[var(--vw-gray)] min-h-screen text-gray-800 font-sans">
@@ -278,6 +317,7 @@ $prestamos = $conexion->query("
                         <th><i class="fa-solid fa-tools mr-1"></i> Herramienta</th>
                         <th><i class="fa-solid fa-user mr-1"></i> Prestada a</th>
                         <th><i class="fa-solid fa-store mr-1"></i> Sucursal</th>
+                        <th><i class="fa-solid fa-location-dot mr-1"></i> Ubicación</th>
                         <th><i class="fa-solid fa-clock mr-1"></i> Fecha del préstamo</th>
                         <th><i class="fa-solid fa-comment mr-1"></i> Comentario (opcional)</th>
                         <th><i class="fa-solid fa-cog mr-1"></i> Acción</th>
@@ -289,7 +329,7 @@ $prestamos = $conexion->query("
                             <td>
                                 <strong><?= htmlspecialchars($p['herramienta']) ?></strong>
                                 <?php if ($p['codigo']): ?>
-                                    <br><small class="text-gray-500">Código: <?= htmlspecialchars($p['codigo']) ?></small>
+                                    <span class="codigo-txt">Código: <?= htmlspecialchars($p['codigo']) ?></span>
                                 <?php endif; ?>
                             </td>
                             <td><?= htmlspecialchars($p['mecanico'] ?? $p['nombre_personalizado']) ?></td>
@@ -298,14 +338,17 @@ $prestamos = $conexion->query("
                                     <?= htmlspecialchars($p['sucursal']) ?>
                                 </span>
                             </td>
+                            <td>
+                                <?= htmlspecialchars($p['ubicacion']) ?>
+                            </td>
                             <td><?= date('d/m/Y H:i', strtotime($p['fecha_hora'])) ?></td>
                             <td>
                                 <textarea class="comentario-input" rows="2" placeholder="Comentarios sobre la devolución..." id="comentario-<?= $p['id'] ?>"></textarea>
                             </td>
                             <td>
-                                <button class="btn-devolver" onclick="confirmarDevolucion(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['herramienta'])) ?>')">
-                                    <i class="fa-solid fa-box"></i> Devolver
-                                </button>
+                              <button class="btn-devolver" style="min-width:120px;white-space:nowrap;" onclick="confirmarDevolucion(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['herramienta'])) ?>')">
+                                <i class="fa-solid fa-box"></i> Devolver
+                              </button>
                             </td>
                         </tr>
                     <?php endwhile; ?>

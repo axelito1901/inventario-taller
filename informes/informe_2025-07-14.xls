@@ -1,0 +1,8 @@
+<table border='1'><tr>
+    <th>Herramienta</th>
+    <th>Retirado por</th>
+    <th>Sucursal</th>
+    <th>Fecha y hora del préstamo</th>
+    <th>Estado</th>
+    <th>Fecha y hora de devolución</th>
+</tr><tr><td>3014</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 16:07:44</td><td>Activa</td><td>-</td></tr><tr><td>3014</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 16:04:28</td><td>Devuelta</td><td>2025-07-14 16:05:46</td></tr><tr><td>3014</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 16:03:40</td><td>Devuelta</td><td>2025-07-14 16:04:21</td></tr><tr><td>3014</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 16:02:07</td><td>Devuelta</td><td>2025-07-14 16:02:33</td></tr><tr><td>3220</td><td>Ramiro Martinez</td><td>Osvaldo Cruz</td><td>2025-07-14 15:46:44</td><td>Activa</td><td>-</td></tr><tr><td>VW 511</td><td>Ramiro Martinez</td><td>Osvaldo Cruz</td><td>2025-07-14 15:46:44</td><td>Activa</td><td>-</td></tr><tr><td>T40187</td><td>Luis Paez</td><td>Osvaldo Cruz</td><td>2025-07-14 15:46:30</td><td>Activa</td><td>-</td></tr><tr><td>T10389</td><td>Luis Paez</td><td>Osvaldo Cruz</td><td>2025-07-14 15:46:30</td><td>Activa</td><td>-</td></tr><tr><td>T10170 A</td><td>Thomas Moreno</td><td>Lanús</td><td>2025-07-14 15:45:46</td><td>Activa</td><td>-</td></tr><tr><td>T50038</td><td>Thomas Moreno</td><td>Lanús</td><td>2025-07-14 15:45:46</td><td>Activa</td><td>-</td></tr><tr><td>VW207 C</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 15:45:15</td><td>Activa</td><td>-</td></tr><tr><td>30-506 B</td><td>Axel Perez</td><td>Lanús</td><td>2025-07-14 15:45:15</td><td>Activa</td><td>-</td></tr></table>
